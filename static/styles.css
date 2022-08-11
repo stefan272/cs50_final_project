@@ -1,0 +1,23 @@
+nav .navbar-brand {
+    font-size: xx-large;
+}
+
+nav .navbar-brand .blue {
+    color: #537fbe;
+}
+.form-box {
+    background-color: rgba(200,200,200,0.25);
+    padding: 15px;
+    border-radius: 25px;
+}
+.form-box:hover {
+    background-color: rgba(200,200,200,0.5);
+}
+.text-blue {
+    color: #537fbe;
+    font-weight: bold;
+}
+.text-green {
+    color: #2e944b;
+    font-weight: bold;
+}
