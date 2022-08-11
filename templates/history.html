@@ -1,0 +1,64 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    History
+{% endblock %}
+{% block main %}
+<div id="table"></div>
+
+
+
+
+
+
+
+<h3 class="display-6 mb-4">Transaction History</h3>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th class="text-start">Date</th>
+            <th class="text-start">Name</th>
+            <th class="text-end">Amount</th>
+            <th class="text-center">Category</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in history %}
+            <tr>
+                <td class="text-start">{{ item['date'] }}</td>
+                <td class="text-start">{{ item['description'] }}</td>
+                <td class="text-end">{{ item['amount'] | gbp }}</td>
+                <!-- <td class="text-center">
+                    <form>
+                        <select name="category" id="categoryInput">
+                            <option>{{ item['category'] }}</option>
+                            {% for category in categories %}
+                                <option>{{ category['category'] }}</option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                </td> -->
+                <td class="'text-center">
+                    <form action="/history/update" method="post">
+                        <select  class="form-select form-select-sm" name="category">
+                            <option selected disabled>{{ item['category'] }}</option>
+                            {% for category in categories %}
+                                <option>{{ category['category'] }}</option>
+                            {% endfor %}
+                        </select>
+                        <input name="id" type="hidden" value="{{ item['transaction_id'] }}">
+                        <button type="submit" class="btn btn-primary updateButton">Update</button>
+                    </form>
+                </td>
+                
+                <td class="'text-center">
+                    <form action="/history/delete" method="post">
+                        <input name="id" type="hidden" value="{{ item['transaction_id'] }}">
+                        <button type="submit" class="btn btn-secondary deleteButton" name="remove">Remove</button>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
