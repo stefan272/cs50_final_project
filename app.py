@@ -13,8 +13,9 @@ from wtforms import FileField, SubmitField
 from wtforms.validators import InputRequired
 from werkzeug.utils import secure_filename
 from textwrap import indent
+from datetime import date, datetime
 
-from helpers import login_required, validate_entry, validate_password, gbp, past_date, date_strip, date_format, format_string
+from helpers import login_required, validate_entry, validate_password, gbp, past_date, date_strip, date_format, format_string, month
 
 # Configure application
 app = Flask(__name__)
@@ -31,6 +32,7 @@ Session(app)
 
 # Custom filter
 app.jinja_env.filters['gbp'] = gbp
+app.jinja_env.filters['month'] = month
 
 # Configure SQLite database
 def dict_factory(cursor, row):
@@ -119,31 +121,25 @@ def after_request(response):
 @login_required
 def index():
     
-    # Get past date
-    last_year = past_date('year', 1)
+    # Get the oldest date from the transactions
+    oldestDate = cursor.execute("SELECT MIN(date) FROM transactions WHERE user_id=?" , (session['user_id'],)).fetchone()
     
-    # Get past date
-    last_month = past_date('year', 2)
-    
-    
-    # Get a dict list of all of the categories
-    expenses = cursor.execute("SELECT category, categories.cat_id FROM transactions JOIN categories ON transactions.cat_id = categories.cat_id WHERE user_id=? GROUP BY category",(session['user_id'],)).fetchall()
+    # Extract the year from the oldest date
+    oldestYear = datetime.strptime(oldestDate['MIN(date)'], '%Y-%m-%d').year
 
-    for item in expenses:
-        # update each dict with the average over the last year
-        average = cursor.execute("SELECT SUM(amount) FROM transactions WHERE user_id=? AND cat_id=? AND (date BETWEEN date('now','-1 year') AND date('now'))", (session['user_id'], item['cat_id'])).fetchone()
-        if average['SUM(amount)'] != None:
-            item['average'] = (average['SUM(amount)'])/12 # /12??
-        else:
-            item['average'] = 0
-        # update each dict with the last month total
-        current = cursor.execute("SELECT SUM(amount) FROM transactions WHERE user_id=? AND cat_id=? AND (date BETWEEN date('now','start of month') AND date('now'))", (session['user_id'], item['cat_id'])).fetchone()
-        if current['SUM(amount)'] != None:
-            item['current'] = current['SUM(amount)']
-        else:
-            item['current'] = 0
+    # Get current year
+    currentYear = date.today().year
 
-    return render_template('index.html', expenses_month=json.dumps(expenses), expenses=expenses)
+    # Create list of years between oldest and now
+    years = []
+    for year in range(oldestYear, currentYear+1):
+        years.append(year)
+    print(years)
+    # Get the current month for the initial chart filter
+    currentMonth = date.today().strftime('%b')
+    print(currentMonth)
+
+    return render_template('index.html', currentMonth=currentMonth, currentYear=currentYear, years=years)
 
 
 @app.route('/homepage')
@@ -309,15 +305,21 @@ def manual_add():
     amount = request.form.get('amount')
     category = request.form.get('category')
     cat_id = cursor.execute("SELECT cat_id FROM categories WHERE category = ?", (category,)).fetchone()
+    print(date)
+    print(desc)
+    print(amount)
+    print(cat_id)
+    with connection:
+            cursor.execute("""INSERT or REPLACE INTO transactions (user_id, date, amount, description, cat_id)
+            VALUES (?, ?, ?, ?, ?)""", (session['user_id'], date, amount, desc, cat_id['cat_id']))
+    # # manual_transaction=[{}]
 
-    manual_transaction=[{}]
+    # manual_transaction[0]['date'] = date
+    # manual_transaction[0]['amount'] = amount
+    # manual_transaction[0]['description'] = desc
+    # manual_transaction[0]['cat_id'] = cat_id['cat_id']
 
-    manual_transaction[0]['date'] = date
-    manual_transaction[0]['amount'] = amount
-    manual_transaction[0]['description'] = desc
-    manual_transaction[0]['cat_id'] = cat_id['cat_id']
-
-    add_transaction(manual_transaction)
+    # add_transaction(manual_transaction)
 
     flash("Added!")
     return redirect('/upload')
@@ -327,38 +329,29 @@ def manual_add():
 @login_required
 def history():
     # Display list of historical transactions
-
-    # Query for all transactions
-    # history = cursor.execute("""SELECT date, amount, description, categories.category, transaction_id
-    #                             FROM transactions
-    #                             JOIN categories
-    #                             ON transactions.cat_id = categories.cat_id
-    #                             WHERE user_id = ?
-    #                             ORDER BY date DESC
-    #                             """, (session['user_id'],)).fetchall()
-
-    # # Query for list of available categories
-    # categories = cursor.execute("SELECT category FROM categories").fetchall()
-
+    
     return render_template('history.html')
 
 
 @app.route('/api/data')
 @login_required
 def data():
-    history = cursor.execute("""SELECT date, amount, description, categories.category, transaction_id
+    transactions = cursor.execute("""SELECT date, amount, description, categories.category, transaction_id, categories.type
                                 FROM transactions
                                 JOIN categories
                                 ON transactions.cat_id = categories.cat_id
                                 WHERE user_id = ?
                                 ORDER BY date DESC
                                 """, (session['user_id'],)).fetchall()
+    
+    # print(json.dumps(transactions, indent=2))
+    return json.dumps(transactions)
 
-    return {'data': history}
 
-
-@app.route('/api/data', methods=['POST'])
+@app.route('/api/data/update', methods=['POST'])
+@login_required
 def update():
+    
     data = request.get_json()
     print(data)
     if 'id' not in data:
@@ -366,12 +359,16 @@ def update():
 
 
     # Query for new cat id
-    new_cat = cursor.execute("SELECT cat_id FROM categories WHERE category=?", (data['category'],)).fetchone()
+    try:
+        new_cat = cursor.execute("SELECT cat_id FROM categories WHERE category=?", (data['category'],)).fetchone()
+        with connection:
+            cursor.execute("""UPDATE transactions
+                                SET cat_id=? WHERE transaction_id=?""", (new_cat['cat_id'], data['id']))
+    except TypeError:
+        flash("Invalid Category")
+        return redirect('/history'), 400
 
     # Insert transaction into database
-    with connection:
-        cursor.execute("""UPDATE transactions
-                            SET cat_id=? WHERE transaction_id=?""", (new_cat['cat_id'], data['id']))
 
     return '', 204
 
@@ -379,21 +376,28 @@ def update():
 @login_required
 def delete():
     # Allow manual transaction deletion
+    data = request.get_json()
+    print(data)
+    if 'id' not in data:
+        return render_template('error.html')
 
-    # Get id of transaction to be deleted
-    id = request.form.get('id')
-    # If valid id, delete from database
-    if id:
-        with connection:
-            cursor.execute("""DELETE FROM transactions 
-                                    WHERE user_id=? 
-                                      AND transaction_id=?
-                           """, (session['user_id'], id))
+    with connection:
+        cursor.execute("""DELETE FROM transactions 
+                                WHERE user_id=? 
+                                    AND transaction_id=?
+                        """, (session['user_id'], data['id']))
     
-    return redirect ('/history')
-    
+    return '', 204
+
+
+if __name__ == '__main__':
+    app.run(debug=True)   
+
 # TODO
-    # Add delete option to table
+    # Create dummy data
+    # Create more extensive categorization
+    # Allow customer to add a category
+        # if new category added, re-sort data
     # Allow manual adding of transaction
     # Fix double post response when changing category
     # Allow filtering of transactions by date/category

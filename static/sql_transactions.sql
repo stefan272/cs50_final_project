@@ -71,6 +71,13 @@ VALUES
 -- Insert global assignments data
 INSERT INTO global_assignments (cat_id, keyword)
 VALUES
+(1, 'apple'),
+(1, 'adobe'),
+(1, 'o2'),
+(1, 'nabu casa'),
+(8, 'marks&spencer'),
+(15, 'tfgm');
+
 (1, 'energy'),
 (1, 'british gas'),
 (1, 'united utilities'),

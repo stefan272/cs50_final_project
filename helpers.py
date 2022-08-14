@@ -47,6 +47,15 @@ def gbp(value):
     return f"£{value:,.2f}"
 
 
+def month(value):
+    # Format month int to text
+    month_num = str(value)
+    datetime_object = datetime.strptime(month_num, "%b")
+    month_name = datetime_object.strftime("%m")
+
+    return month_name
+
+
 def past_date(field, t):
     # Return a timedelta date
     

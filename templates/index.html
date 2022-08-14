@@ -4,84 +4,58 @@
     Index
 {% endblock %}
 {% block main %}
-<h1>Financial Dashboard</h1>
-<div class="col-xs-10 col-sm-6 col-md-6">
-    <div class="card card-style mb-2">
-        <div class="card-body">
-            <h2>Expenses</h2>
-            <div class="chart-container" style="position: relative;">
-                <canvas id="expenses"></canvas>
+<h1 class="display-2">Financial Dashboard</h1>
+<div class="container-fluid mt-4 mb-4 dashboardBlock">
+    <div class="title">
+        <h2 class="display-4 me-auto">Expenses</h2>
+        <!-- <div class="select-wrapper"> -->
+            <select name="yearpicker" id="yearpicker" onchange="updateChart()" class="datepicker ms-auto">
+                <option value="{{currentYear}}" selected>{{currentYear}}</option>
+                {% for year in years %}
+                    <option value="{{year}}">{{year}}</option>
+                {% endfor %}
+            </select>
+            <select name="monthpicker" id="monthpicker" onchange="updateChart()" class="datepicker ms-auto">
+                <option value="{{currentMonth | month }}" selected>{{ currentMonth }}</option>
+                <option value="01">Jan</option>
+                <option value="02">Feb</option>
+                <option value="03">Mar</option>
+                <option value="04">Apr</option>
+                <option value="05">May</option>
+                <option value="06">Jun</option>
+                <option value="07">Jul</option>
+                <option value="08">Aug</option>
+                <option value="09">Sep</option>
+                <option value="10">Oct</option>
+                <option value="11">Nov</option>
+                <option value="12">Dec</option>
+            </select>
+        <!-- </div> -->
+    </div>
+    <div class="dashboard-cards">
+        <div class="card" id="card-1">
+            <div class="chart-canvas">
+                <canvas id="expensesBar"></canvas>
+            </div>
+        </div>
+        <div class="card"  id="card-2">
+            <div class="chart-canvas">
+                <canvas id="expensesPie"></canvas>
+            </div>
+        </div>
+        <div class="card"  id="card-3">
+            <div class="chart-canvas">
+
+            </div>
+        </div>
+        <div class="card"  id="card-4">
+            <div class="chart-canvas">
+
             </div>
         </div>
     </div>
 </div>
-{% block javascript %}
-<script>
-    let expense_month_data = JSON.parse({{expenses_month|tojson|safe}})
-
-    var ctx = document.getElementById("expenses").getContext('2d')
-    var income_vs_category_chart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            // labels: ['Average', 'Current'],
-            datasets: [{
-                label: 'Average',
-            data: expense_month_data,
-            parsing: {
-                xAxisKey: 'category',
-                yAxisKey: 'current'
-                },
-            backgroundColor: 'blue',
-            }, {
-            label: 'Average',
-            data: expense_month_data,
-            parsing: {
-                xAxisKey: 'category',
-                yAxisKey: 'average'
-                },
-            backgroundColor: 'green'
-            }]
-        },
-        options: {
-            scales: {
-                x: {
-                    stacked: true
-                }
-            }
-        }
-});
-</script>
-{% endblock%}
-
-<div class="container-fluid">
-
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th class="text-start">Category</th>
-                <th class="text-start">Total</th>
-                <th class="text-start">Average</th>
-                <th class="text-start">Difference</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for expense in expenses %}
-                <tr>
-                    <td class="text-start">{{ expense['category'] }}</td>
-                    <td class="text-end">{{ (expense['current']|abs)|gbp }}</td>
-                    <td class="text-end">{{ (expense['average']|abs)|gbp }}</td>
-                    {% if expense['current'] > expense['average'] %}
-                        <td class="text-start">Above Average</td>
-                    {% elif expense['current'] < expense['average'] %}
-                        <td class="text-start">Below Average</td>
-                    {% else %}
-                        <td class="text-start">Average</td>
-                    {% endif %}
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
-<p>This will display the dashboard interface</p>
+<!-- <script type="text/javascript" src="/static/utility_dashboard.js"></script> -->
+<script type="text/javascript" src="/static/script_dashboard.js"></script>
 {% endblock %}
 

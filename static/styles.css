@@ -21,3 +21,67 @@ nav .navbar-brand .blue {
     color: #2e944b;
     font-weight: bold;
 }
+.dashboard-cards {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    margin: 0;
+    padding-bottom: 50px;
+    gap: 50px;
+}
+
+@media only screen and (max-width: 1200px) {
+    .dashboard-cards{
+        grid-template-columns: 1fr;
+    }
+}
+
+.card {
+    width: 100%;   
+    background-color: white;
+    border-radius: 10px;
+    box-shadow:  2px 2px 2px whitesmoke;
+}
+
+.chart-canvas {
+    margin: 20px;
+    position: relative;
+    /* min-height: 250px;
+    max-height: 500px; */
+}
+
+/* .chart-options {
+    position: absolute;
+    right: 30px;
+    top: 14px;
+} */
+.select-wrapper {
+    width: 180px;
+    margin-left: 50px;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+/* .select-wrapper::before {
+    position: absolute;
+    content: "▼";
+    font-size: var(--font-size-xs);
+    right: 20px;
+    color: var(--second-font-color);
+  } */
+
+.datepicker {
+    color: white;
+    background-color: #537fbe;
+  }
+
+.dashboardBlock {
+    background-Color: rgb(206, 206, 206);
+    border-radius: 20px;
+}
+
+.dashboardBlock .title {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
