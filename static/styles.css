@@ -1,14 +1,78 @@
+html {
+    background-color:rgb(242, 242, 242)
+}
+body {
+    background-color:rgb(242, 242, 242);
+    margin:0px;
+    padding:0px;
+    width:100%;
+    /* position: fixed; */
+}
+body, html {
+    margin:0;
+    padding:0;
+}
 nav .navbar-brand {
-    font-size: xx-large;
+    font-size: 30pt;
+}
+nav .navbar-brand .blue {
+    color: #3288ff;
+}
+.nav-bg {
+    background: linear-gradient(235deg, rgba(131,58,180,0.8) 0%, rgba(250, 76, 76, 0.8) 50%, rgba(252, 176, 69, 0.8) 100%);
+}
+nav ul li {
+    list-style: none;
+    display: inline-block;
+    margin: 0 20px;
+    position: relative;
+}
+nav ul li a {
+    text-decoration: none;
+    color: rgb(255, 255, 255);
+    text-transform: uppercase;
+    font-size: 14pt;
+}
+nav ul li::after {
+    content: '';
+    height: 3px;
+    width: 0;
+    background: #3288ff;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    transition: 0.35s;
+}
+.navbar ul li:hover::after {
+    width: 100%;
+}
+.welcome-bg {
+    background: url(images/charts.jpeg) no-repeat center center fixed; 
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    height: 100vh;
+    width: 100vw;
+    margin: 0px;
+}
+.welcome-title {
+    display: flex;
+    flex-direction: column;
+    align-items: right;
+    border-width: 1px;
+    border: black;
 }
 
-nav .navbar-brand .blue {
-    color: #537fbe;
-}
+
+
 .form-box {
     background-color: rgba(200,200,200,0.25);
+    display: flex;
+    flex-direction: column;
     padding: 15px;
     border-radius: 25px;
+    width: 25vw;
 }
 .form-box:hover {
     background-color: rgba(200,200,200,0.5);
@@ -30,8 +94,11 @@ nav .navbar-brand .blue {
 }
 
 @media only screen and (max-width: 1200px) {
-    .dashboard-cards{
+    .dashboard-cards {
         grid-template-columns: 1fr;
+    }
+    .form-box {
+        width: 75vw;
     }
 }
 
@@ -48,12 +115,6 @@ nav .navbar-brand .blue {
     /* min-height: 250px;
     max-height: 500px; */
 }
-
-/* .chart-options {
-    position: absolute;
-    right: 30px;
-    top: 14px;
-} */
 .select-wrapper {
     width: 180px;
     margin-left: 50px;

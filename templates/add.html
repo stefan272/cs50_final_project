@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Upload
+{% endblock %}
+{% block main %}
+<h1 class="display-3">Add Transactions</h1>
+<div class="container-fluid mb-5">
+    <div class="form-box mx-auto">
+
+        <h2 class="display-4">Add</h2>
+        <form method="post" action="/add">
+            <input type="date" name="date">
+            <input type="text" value="Description" name="desc">
+            <input type="number" value="Amount" name="amount">
+            <select  class="form-select form-select-sm" name="category">
+                <option selected disabled>Choose...</option>
+                {% for category in categories %}
+                <option>{{ category['category'] }}</option>
+                {% endfor %}
+            </select>
+            <button class="btn btn-primary" type="submit">Add</button>
+        </form>
+    </div>
+    <div class="form-box mx-auto mt-5">
+        <h2 class="display-4">Upload-New</h2>
+        <form action="/add/upload" method="post" enctype="multipart/form-data">
+            <input type="file" name="file">
+            <button class="btn btn-primary"type="submit">Upload</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

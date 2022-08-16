@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function(){
             formatter: (cell, row) => {
               return gridjs.h('button', {
                 className: 'py-2 mb-4 px-4 border rounded-md text-white bg-blue-600',
-                onClick: () => fetch('/history/delete', {
+                onClick: () => fetch('/api/data/delete', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({

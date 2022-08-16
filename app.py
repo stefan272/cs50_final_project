@@ -1,21 +1,15 @@
 import os
-import sqlite3
 import csv
 import json
-import re
+import database_queries
+import helpers
 
-from flask import Flask, flash, redirect, render_template, request, session, jsonify
+from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
-from tempfile import mkdtemp
 from werkzeug.security import check_password_hash, generate_password_hash
-from flask_wtf import FlaskForm
-from wtforms import FileField, SubmitField
-from wtforms.validators import InputRequired
 from werkzeug.utils import secure_filename
 from textwrap import indent
-from datetime import date, datetime
-
-from helpers import login_required, validate_entry, validate_password, gbp, past_date, date_strip, date_format, format_string, month
+from datetime import date
 
 # Configure application
 app = Flask(__name__)
@@ -23,7 +17,8 @@ app = Flask(__name__)
 # Configure application
 app.config['TEMPLATES_AUTO_RELOAD'] = True # Ensure templates are reloaded
 app.config['SECRET_KEY'] = 'supersecretkey' # Set secret key for file upload
-app.config['UPLOAD_FOLDER'] = 'static/files' # Set file upload folder
+app.config['UPLOAD_FOLDER'] = 'static/uploads' # Set file upload folder
+ALLOWED_EXTENSIONS = {'csv'}
 
 # Configure session to use filesystem (instead of signed cookies)
 app.config["SESSION_PERMANENT"] = False
@@ -31,81 +26,8 @@ app.config['SESSION_TYPE'] = 'filesystem'
 Session(app)
 
 # Custom filter
-app.jinja_env.filters['gbp'] = gbp
-app.jinja_env.filters['month'] = month
-
-# Configure SQLite database
-def dict_factory(cursor, row):
-    d = {}
-    for idx, col in enumerate(cursor.description):
-        d[col[0]] = row[idx]
-    return d
-connection = sqlite3.connect('final.db', check_same_thread=False)
-connection.row_factory = dict_factory
-cursor = connection.cursor()
-
-# Configure file uploading
-class UploadFileForm(FlaskForm):
-    file = FileField('File', validators=[InputRequired()])
-    submit = SubmitField('Upload File')
-
-
-# Add the transactions to the database
-def add_transaction(transaction):
-
-    with connection:
-            cursor.execute("""INSERT or REPLACE INTO transactions (user_id, date, amount, description, cat_id)
-            VALUES (?, ?, ?, ?, ?)""", (session['user_id'], transaction['date'], transaction['amount'], transaction['description'], transaction['cat_id']))
-    return
-
- 
-# Assign categories
-def categorize(transactions):
-
-# for each of the rows
-    for item in transactions:
-        # if amount less than zero, type=expense
-        if item['amount'] <= 0:
-            type = 'Expense'
-        # else type=income
-        else:
-            type = 'Income'
-        
-        # # Query the user assignments table
-        # rows = cursor.execute("""SELECT user_assignments.cat_id 
-        #                             FROM user_assignments
-        #                             JOIN categories
-        #                             ON user_assignments.cat_id = categories.cat_id
-        #                             WHERE user_id = ?
-        #                             AND type = ?
-        #                             AND description = ?""", (session['user_id'], type, item['description'])).fetchone()
-        # If a result is found
-        # if rows != None:
-        #     # Update the item dict
-        #     item['cat_id'] = rows['cat_id']
-        #     # Insert transaction into database (pass into function)
-        #     add_transaction(item)
-        #     break
-
-        # # Check if a match in the global assignments
-        # else:
-
-        # Query a list of global assignments
-        rows = cursor.execute("SELECT cat_id, keyword FROM global_assignments").fetchall()
-
-        assigned = False
-        for row in rows:
-            if row['keyword'] in item['description'].lower():
-                item['cat_id'] = row['cat_id']
-                add_transaction(item)
-                assigned = True
-        if assigned == False:
-            # Get the cat_id for the correct 'other' assignment
-            general = cursor.execute("SELECT cat_id FROM categories WHERE category = ?", (f'General ({type})',)).fetchone()
-            item['cat_id'] = general['cat_id']
-            add_transaction(item)
-        
-    return transactions
+app.jinja_env.filters['gbp'] = helpers.gbp
+app.jinja_env.filters['month'] = helpers.month
 
 
 @app.after_request
@@ -118,34 +40,31 @@ def after_request(response):
 
 
 @app.route('/')
-@login_required
-def index():
+@helpers.login_required
+def index(): #TODO
     
+    # Create list of available years
+
     # Get the oldest date from the transactions
-    oldestDate = cursor.execute("SELECT MIN(date) FROM transactions WHERE user_id=?" , (session['user_id'],)).fetchone()
-    
-    # Extract the year from the oldest date
-    oldestYear = datetime.strptime(oldestDate['MIN(date)'], '%Y-%m-%d').year
+    oldestYear = database_queries.oldest_year(session['user_id'])
 
     # Get current year
     currentYear = date.today().year
 
-    # Create list of years between oldest and now
     years = []
     for year in range(oldestYear, currentYear+1):
         years.append(year)
-    print(years)
+
     # Get the current month for the initial chart filter
     currentMonth = date.today().strftime('%b')
-    print(currentMonth)
 
     return render_template('index.html', currentMonth=currentMonth, currentYear=currentYear, years=years)
 
 
-@app.route('/homepage')
-def homepage():
-    # Display the homepage
-    return render_template('homepage.html')
+@app.route('/welcome')
+def welcome():
+    # Display the welcome page
+    return render_template('welcome.html')
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -159,21 +78,26 @@ def login():
     if request.method == 'POST':
 
         # Validate the user has entered all fields
-        if validate_entry(request.form.get('username')):
-            username = request.form.get('username')
-        if validate_entry(request.form.get('password')):
-            password = request.form.get('password')
+        # Define list of form fields
+        fields = ['username', 'password']
+
+        # Validate all fields are entered
+        entries = helpers.validate_entries(request.form, fields)
+        if len(entries) != len(fields):
+            flash("Enter all fields")
+            return redirect('/register')
 
         # Query database for username
-        rows = cursor.execute("SELECT * FROM users WHERE username = ?", (username,)).fetchall()
+        rows = database_queries.username_check(entries['username'])
 
         # Ensure username and password are valid
-        if len(rows) != 1 or not check_password_hash(rows[0]['hash'], password):
+        if len(rows) != 1 or not check_password_hash(rows[0]['hash'], entries['password']):
             flash("Invalid credentials")
             return redirect('/login')
         
         # Remember which user has logged in and redirect
         session["user_id"] = rows[0]['user_id']
+        flash("Welcome Back!")
         return redirect('/') 
 
     # User reached route via GET (clicking a link or via redirect)
@@ -193,50 +117,38 @@ def logout():
 
 
 @app.route('/register', methods=["GET", "POST"])
-def register():
+def register(): #TODO - password validation
     # Register new user
 
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
-        # return render_template('apology.html')
 
-        # Validate that the user has populated all fields
-        # TODO consolidate into single function
-        # Check the first name is entered
-        if validate_entry(request.form.get('fname')):
-            first = request.form.get('fname')
-        # Check the second name is entered
-        if validate_entry(request.form.get('sname')):
-            last = request.form.get('sname')
-        # Check the username is entered
-        if validate_entry(request.form.get('username')):
-            username = request.form.get('username')
-        # Check the password is entered
-        if validate_entry(request.form.get('password')):
-            password = request.form.get('password')
-        # Check the confirmation is entered
-        if validate_entry(request.form.get('confirmation')):
-            confirmation = request.form.get('confirmation')
-        
+        # Define list of form fields
+        fields = ['first', 'last', 'username', 'password', 'confirmation']
+        # Validate all fields are entered
+        entries = helpers.validate_entries(request.form, fields)
+        if len(entries) != len(fields):
+            flash("Enter all fields")
+            return redirect('/register')
+
         # Check the username is not already taken
-        rows = cursor.execute("SELECT * FROM users WHERE username = ?", (username,)).fetchall()
+        rows = database_queries.username_check(entries['username'])
         if len(rows) > 0:
             flash("Username already taken")
             return redirect('/register')
         
         # Check the password length/character inclusion & matching
-        if validate_password(password, confirmation) == False:
+        if helpers.validate_password(entries['password'], entries['confirmation']) == False:
             flash("Invalid password")
             redirect("/register")
         else:
             # Hash the users given password
-            pwhash = generate_password_hash(password, method='pbkdf2:sha256', salt_length=16)
-            # Insert the user into the database
-            with connection:
-                cursor.execute("""INSERT INTO users(first_name, last_name, username, hash) 
-                                       VALUES (?, ?, ? ,?)
-                               """, (first, last, username, pwhash))
-        
+            pwhash = generate_password_hash(entries['password'], method='pbkdf2:sha256', salt_length=16)
+            # Add hashed password to entries
+            entries['hash'] = pwhash
+            # Create user and store new user ID
+            session['user_id'] = database_queries.create_user(entries)
+
         # Return back to the homescreen
         flash("Registered!")
         return redirect('/')
@@ -246,87 +158,99 @@ def register():
         return render_template('register.html')
 
 
-# Allow user to upload a file
-@app.route('/upload', methods=['GET', 'POST'])
-@login_required
-def upload():
 
-    # Definite form allow data upload (html)
-    form = UploadFileForm()
-    categories = cursor.execute("SELECT category FROM categories").fetchall()
+@app.route('/add', methods=['GET', 'POST'])
+@helpers.login_required
+def add():
+    # Allow user to add a transaction
+
+    # Query list of available categories
+    categories = database_queries.categories()
     
     # User reached route via POST (form submission)
     if request.method == 'POST':
         
-        # Save the submitted file
-        if form.validate_on_submit():
-            file = form.file.data
-            # Validate the file is .csv
-            if os.path.splitext(file.filename)[-1].lower() != '.csv':
-                flash('Only .csv files can be uploaded')
-                return redirect('/upload')
-            # Create secure filename and save file
-            file.save(os.path.join(os.path.abspath(os.path.dirname(__file__)), app.config['UPLOAD_FOLDER'],secure_filename(file.filename)))
-            # TODO either delete the file after use or open instead of save the file
-            # TODO check column config correct
-
-        # Read the .csv file into a list
-        transactions = []
-
-        with open('static/files/{}'.format(file.filename), 'r', encoding='utf-8') as data: # Date, Amount, Description
-            reader = csv.DictReader(data)
-            reader.fieldnames = [name.lower() for name in reader.fieldnames]
-            for item in reader:
-                if item['date'] == None:
-                    break
-                else:
-                    # item['date'] = date_format(item['date'])
-                    item['amount'] = float(item['amount'])
-                    item['description'] = format_string(item['description'])
-                    transactions.append(item)
-                    print(item)
+        # Define list of form fields
+        fields = ['date', 'desc', 'amount', 'category']
+        # Validate all fields are entered
+        entries = helpers.validate_entries(request.form, fields)
+        if len(entries) != len(fields):
+            flash("Enter all fields")
+            return redirect('/register')
         
-        categorize(transactions)
-
-        flash('Uploaded!')
-        return redirect('/upload')
+        # Get the id for the given category
+        res = database_queries.category_to_id(entries['category'])
+        # Add transaction to database
+        entries['cat_id'] = res['cat_id']
+        database_queries.add_transaction(entries, session['user_id'])
+ 
+        flash("Added!")
+        return redirect('/add')
 
     # User reached route via GET (clicking a link or via redirect)
     else:
-        return render_template('upload.html', form=form, categories=categories)
+        return render_template('add.html', categories=categories)
 
 
-@app.route('/upload/add', methods=['POST'])
-@login_required
-def manual_add():
+@app.route('/add/upload', methods=['POST'])
+@helpers.login_required
+def upload():
+    # Allow .csv data upload
 
-    date = request.form.get('date')
-    desc = request.form.get('desc')
-    amount = request.form.get('amount')
-    category = request.form.get('category')
-    cat_id = cursor.execute("SELECT cat_id FROM categories WHERE category = ?", (category,)).fetchone()
-    print(date)
-    print(desc)
-    print(amount)
-    print(cat_id)
-    with connection:
-            cursor.execute("""INSERT or REPLACE INTO transactions (user_id, date, amount, description, cat_id)
-            VALUES (?, ?, ?, ?, ?)""", (session['user_id'], date, amount, desc, cat_id['cat_id']))
-    # # manual_transaction=[{}]
+    # Check if file object has been submitted
+    if 'file' not in request.files:
+        flash("No file part")
+        return redirect ('/add')
+    # Store the file object
+    file = request.files['file']
+    # Check if filename empty
+    if file.filename == '':
+        flash("No file selected")
+        return redirect('/add')
+    # Check the file extension is acceptable
+    if file and helpers.allowed_file(file.filename, ALLOWED_EXTENSIONS):
+        # Get the file a secure filename and save
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+    else:
+        flash('Only .csv files can be uploaded')
+        return redirect('/add')
+        
+    # Read the .csv file into a list
+    transactions = []
+    columns = ['date', 'amount', 'description']
 
-    # manual_transaction[0]['date'] = date
-    # manual_transaction[0]['amount'] = amount
-    # manual_transaction[0]['description'] = desc
-    # manual_transaction[0]['cat_id'] = cat_id['cat_id']
+    with open('static/uploads/{}'.format(file.filename), 'r', encoding='utf-8') as data: # Date, Amount, Description
+        reader = csv.DictReader(data)
+        # Convert column headers to lowercase
+        reader.fieldnames = [name.lower() for name in reader.fieldnames]
+        # Check correct column configuration
+        for name in reader.fieldnames:
+            if not name in columns:
+                flash("Incorrect column configuration")
+                return redirect('/add')
+        for item in reader:
+            if item['date'] == None:
+                break
+            else:
+                # Format the fields correctly
+                item['date'] = helpers.format_date(item['date'])
+                item['amount'] = float(item['amount'])
+                item['description'] = helpers.format_string(item['description'])
+                # Add item to transactions list
+                transactions.append(item)
+    
+    # Remove the uploaded file
+    os.remove('static/uploads/{}'.format(file.filename))
+        
+    helpers.categorize(transactions)
 
-    # add_transaction(manual_transaction)
-
-    flash("Added!")
-    return redirect('/upload')
+    flash('Added/Uploaded!')
+    return redirect('/add')
 
 
 @app.route('/history')
-@login_required
+@helpers.login_required
 def history():
     # Display list of historical transactions
     
@@ -334,22 +258,18 @@ def history():
 
 
 @app.route('/api/data')
-@login_required
+@helpers.login_required
 def data():
-    transactions = cursor.execute("""SELECT date, amount, description, categories.category, transaction_id, categories.type
-                                FROM transactions
-                                JOIN categories
-                                ON transactions.cat_id = categories.cat_id
-                                WHERE user_id = ?
-                                ORDER BY date DESC
-                                """, (session['user_id'],)).fetchall()
-    
+    # Query the users transaction data
+
+    transactions = database_queries.all_transactions(session['user_id'])
+
     # print(json.dumps(transactions, indent=2))
     return json.dumps(transactions)
 
 
 @app.route('/api/data/update', methods=['POST'])
-@login_required
+@helpers.login_required
 def update():
     
     data = request.get_json()
@@ -357,36 +277,27 @@ def update():
     if 'id' not in data:
         return render_template('error.html')
 
-
     # Query for new cat id
     try:
-        new_cat = cursor.execute("SELECT cat_id FROM categories WHERE category=?", (data['category'],)).fetchone()
-        with connection:
-            cursor.execute("""UPDATE transactions
-                                SET cat_id=? WHERE transaction_id=?""", (new_cat['cat_id'], data['id']))
+        new_categoryID = database_queries.category_to_id(data['category'])
+        database_queries.update_category(new_categoryID['cat_id'], data['id'])
     except TypeError:
         flash("Invalid Category")
         return redirect('/history'), 400
 
-    # Insert transaction into database
-
     return '', 204
 
-@app.route('/history/delete', methods=['POST'])
-@login_required
+
+@app.route('/api/data/delete', methods=['POST'])
+@helpers.login_required
 def delete():
     # Allow manual transaction deletion
     data = request.get_json()
-    print(data)
     if 'id' not in data:
         return render_template('error.html')
 
-    with connection:
-        cursor.execute("""DELETE FROM transactions 
-                                WHERE user_id=? 
-                                    AND transaction_id=?
-                        """, (session['user_id'], data['id']))
-    
+    database_queries.delete_transaction(session['user_id'], data['id'])
+
     return '', 204
 
 
@@ -398,7 +309,6 @@ if __name__ == '__main__':
     # Create more extensive categorization
     # Allow customer to add a category
         # if new category added, re-sort data
-    # Allow manual adding of transaction
     # Fix double post response when changing category
     # Allow filtering of transactions by date/category
 
