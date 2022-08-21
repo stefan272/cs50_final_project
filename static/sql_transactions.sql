@@ -46,7 +46,6 @@ FOREIGN KEY (cat_id) REFERENCES categories(cat_id)
 );
 
 
-
 -- Insert global categories data
 INSERT INTO categories (category, type)
 VALUES
@@ -71,13 +70,6 @@ VALUES
 -- Insert global assignments data
 INSERT INTO global_assignments (cat_id, keyword)
 VALUES
-(1, 'apple'),
-(1, 'adobe'),
-(1, 'o2'),
-(1, 'nabu casa'),
-(8, 'marks&spencer'),
-(15, 'tfgm');
-
 (1, 'energy'),
 (1, 'british gas'),
 (1, 'united utilities'),
@@ -105,8 +97,10 @@ VALUES
 (13, 'john lewis'),
 (15, 'metrolink'),
 (15, 'bus'),
-(15, 'fuel');
-
+(15, 'fuel'),
+(7, 'birthday gift'),
+(10, 'salary'),
+(10, 'paycheck');
 
 -- Query to see if desc inside user_assignments
 SELECT user_assignments.cat_id 

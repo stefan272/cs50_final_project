@@ -7,27 +7,41 @@
 <h1 class="display-3">Add Transactions</h1>
 <div class="container-fluid mb-5">
     <div class="form-box mx-auto">
-
         <h2 class="display-4">Add</h2>
         <form method="post" action="/add">
-            <input type="date" name="date">
-            <input type="text" value="Description" name="desc">
-            <input type="number" value="Amount" name="amount">
-            <select  class="form-select form-select-sm" name="category">
-                <option selected disabled>Choose...</option>
-                {% for category in categories %}
-                <option>{{ category['category'] }}</option>
-                {% endfor %}
-            </select>
-            <button class="btn btn-primary" type="submit">Add</button>
+            <div class="form-entry">
+                <input type="date" id="date" name="date" class="form-control mx-auto w-auto" required>
+                <small for="date">Select a date</small>
+            </div>
+            <div class="form-entry">
+                <input class="form-control mx-auto w-auto" type="text" placeholder="Description" id="description" name="description" required>
+                <small for="description">Give it a description</small>
+            </div>
+            <div class="form-entry">
+                <input type="number" placeholder="£0.00" name="amount" id="amount" class="form-control mx-auto w-auto" required>
+                <small for="amount">Enter an amount</small>
+            </div>
+            <div class="form-entry">
+                <select  class="form-control mx-auto w-auto" id="category" name="category" required>
+                    <option selected disabled>Select...</option>
+                    {% for category in categories %}
+                    <option>{{ category['category'] }}</option>
+                    {% endfor %}
+                </select>
+                <small for="category">Pick a category</small>
+            </div>
+                <button class="btn btn-primary mt-3" type="submit">Add</button>
         </form>
     </div>
     <div class="form-box mx-auto mt-5">
-        <h2 class="display-4">Upload-New</h2>
+        <h2 class="display-4">Upload</h2>
         <form action="/add/upload" method="post" enctype="multipart/form-data">
-            <input type="file" name="file">
+            <input type="file" name="file" class="form-control-file">
             <button class="btn btn-primary"type="submit">Upload</button>
         </form>
+        <a href="/support">
+            <span>Having trouble?</span>
+        </a>
     </div>
 </div>
 {% endblock %}

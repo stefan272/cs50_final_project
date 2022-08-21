@@ -1,25 +1,21 @@
-html {
-    background-color:rgb(242, 242, 242)
-}
-body {
-    background-color:rgb(242, 242, 242);
-    margin:0px;
-    padding:0px;
-    width:100%;
-    /* position: fixed; */
-}
-body, html {
-    margin:0;
-    padding:0;
+main {
+    background-color:rgb(237, 237, 237);
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    height: 100vh;
+    width: 100vw;
+    margin: 0px;
 }
 nav .navbar-brand {
     font-size: 30pt;
 }
 nav .navbar-brand .blue {
-    color: #3288ff;
+    color: rgba(255, 255, 255, 0.9);
 }
 .nav-bg {
-    background: linear-gradient(235deg, rgba(131,58,180,0.8) 0%, rgba(250, 76, 76, 0.8) 50%, rgba(252, 176, 69, 0.8) 100%);
+    background: linear-gradient(235deg, rgba(27, 199, 53, 0.8) 0%, rgba(204, 76, 250, 0.8) 40%, rgba(126, 142, 249, 0.8) 100%);
 }
 nav ul li {
     list-style: none;
@@ -29,15 +25,15 @@ nav ul li {
 }
 nav ul li a {
     text-decoration: none;
-    color: rgb(255, 255, 255);
+    color: rgb(131,58,180);
     text-transform: uppercase;
     font-size: 14pt;
 }
 nav ul li::after {
     content: '';
-    height: 3px;
+    height: 2px;
     width: 0;
-    background: #3288ff;
+    background: rgb(131,58,180);
     position: absolute;
     left: 0;
     bottom: 0;
@@ -63,9 +59,6 @@ nav ul li::after {
     border-width: 1px;
     border: black;
 }
-
-
-
 .form-box {
     background-color: rgba(200,200,200,0.25);
     display: flex;
@@ -77,9 +70,24 @@ nav ul li::after {
 .form-box:hover {
     background-color: rgba(200,200,200,0.5);
 }
+.form-entry {
+    margin-top: 10px;
+    float: top;
+}
 .text-blue {
     color: #537fbe;
     font-weight: bold;
+}
+.support-block {
+    background-color: rgba(200,200,200,0.25);
+    padding: 15px;
+    border-radius: 25px;
+}
+.support-block p {
+    text-align: left;
+}
+.support-block ul {
+    text-align: left;
 }
 .text-green {
     color: #2e944b;
@@ -87,8 +95,9 @@ nav ul li::after {
 }
 .dashboard-cards {
     display: grid;
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 1fr 1fr;
     margin: 0;
+    padding-top: 10px;
     padding-bottom: 50px;
     gap: 50px;
 }
@@ -103,10 +112,11 @@ nav ul li::after {
 }
 
 .card {
-    width: 100%;   
+    width: 90%;   
     background-color: white;
     border-radius: 10px;
-    box-shadow:  2px 2px 2px whitesmoke;
+    border-color:rgba(27, 199, 53, 0.8);
+    justify-self: center;
 }
 
 .chart-canvas {
@@ -115,34 +125,42 @@ nav ul li::after {
     /* min-height: 250px;
     max-height: 500px; */
 }
-.select-wrapper {
-    width: 180px;
-    margin-left: 50px;
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-
-/* .select-wrapper::before {
-    position: absolute;
-    content: "▼";
-    font-size: var(--font-size-xs);
-    right: 20px;
-    color: var(--second-font-color);
-  } */
-
-.datepicker {
-    color: white;
-    background-color: #537fbe;
-  }
-
-.dashboardBlock {
+.dashboard-block {
     background-Color: rgb(206, 206, 206);
     border-radius: 20px;
-}
-
-.dashboardBlock .title {
     display: flex;
     flex-direction: column;
+    align-items: stretch;
+    margin-top: 10px;
+}
+.right {
+    float: right;
+    margin-right: 1em;
+}
+
+.dashboardBanner {
+    display: flex;
+    flex-direction: row;
     justify-content: space-between;
+    align-items: center;
+    padding-left: 1em;
+    padding-right: 1em;
+}
+.dashboardInsight {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: stretch;
+    padding-left: 2em;
+    padding-right: 2em;
+    flex-wrap: wrap;
+}
+.dashboardInsightBlock {
+    margin-top: 10px;
+    padding-left: 0.5em;
+    padding-right: 2em;
+    border-left: 5px solid rgb(76, 0, 255);
+}
+.dashboardInsightBlock p {
+    color: rgb(5, 5, 94);
 }

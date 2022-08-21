@@ -5,18 +5,18 @@
 {% endblock %}
 {% block main %}
 <h1 class="display-2">Financial Dashboard</h1>
-<div class="container-fluid mt-4 mb-4 dashboardBlock">
-    <div class="title">
-        <h2 class="display-4 me-auto">Expenses</h2>
-        <!-- <div class="select-wrapper"> -->
-            <select name="yearpicker" id="yearpicker" onchange="updateChart()" class="datepicker ms-auto">
-                <option value="{{currentYear}}" selected>{{currentYear}}</option>
+<div class="dashboard-block">
+    <div class="dashboardBanner">  
+        <h2 class="display-4">Expenses</h2>
+        <div>
+            <select name="yearpicker" id="yearpicker" onchange="updateChart()">
+                <option value="{{ currentYear }}" selected>{{ currentYear }}</option>
                 {% for year in years %}
-                    <option value="{{year}}">{{year}}</option>
+                <option value="{{ year }}">{{ year }}</option>
                 {% endfor %}
             </select>
-            <select name="monthpicker" id="monthpicker" onchange="updateChart()" class="datepicker ms-auto">
-                <option value="{{currentMonth | month }}" selected>{{ currentMonth }}</option>
+            <select name="monthpicker" id="monthpicker" onchange="updateChart()">
+                <option value="{{ currentMonth | month }}" selected>{{ currentMonth }}</option>
                 <option value="01">Jan</option>
                 <option value="02">Feb</option>
                 <option value="03">Mar</option>
@@ -30,32 +30,39 @@
                 <option value="11">Nov</option>
                 <option value="12">Dec</option>
             </select>
-        <!-- </div> -->
+        </div>
     </div>
     <div class="dashboard-cards">
-        <div class="card" id="card-1">
+        <div class="card">
             <div class="chart-canvas">
                 <canvas id="expensesBar"></canvas>
             </div>
         </div>
-        <div class="card"  id="card-2">
+        <div class="card">
             <div class="chart-canvas">
-                <canvas id="expensesPie"></canvas>
-            </div>
-        </div>
-        <div class="card"  id="card-3">
-            <div class="chart-canvas">
-
-            </div>
-        </div>
-        <div class="card"  id="card-4">
-            <div class="chart-canvas">
-
+                <h3 class="display-5">Insights</h3>
+                <div class="dashboardInsight">
+                    <div class="dashboardInsightBlock">
+                        <h3>Average</h3>
+                        <p id="averageMonth"></p>
+                    </div>
+                    <div class="dashboardInsightBlock">
+                        <h3>Current</h3>
+                        <p id="currentMonth"></p>
+                    </div>
+                    <div class="dashboardInsightBlock">
+                        <h3>Difference</h3>
+                        <p>You've spent <span id="difference"></span> than the average.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
-<!-- <script type="text/javascript" src="/static/utility_dashboard.js"></script> -->
+<!-- https://www.chartjs.org -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-stacked100@1.0.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
 <script type="text/javascript" src="/static/script_dashboard.js"></script>
 {% endblock %}
 

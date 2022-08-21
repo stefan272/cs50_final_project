@@ -3,66 +3,156 @@
 document.addEventListener("DOMContentLoaded", function(){
     const tableDiv = document.getElementById('table');
 
-    const editableCellAttributes = (data, row, col) => {
-        if (row) {
-        return {contentEditable: 'true', 'data-element-id': row.cells[0].data};
-        }
-        else {
-        return {};
-        }
+    // Async function to get categories from server **NOT WORKING***
+    // async function getCategories() {
+    //     let url = '/api/data/categories';
+    //     try {
+    //         let res = await fetch(url);
+    //         return await res.json();
+    //     } catch (error) {
+    //         console.log(error);
+    //     }
+    // };
+
+    // async function renderOptions() {
+    //     let options = await getCategories();
+    //     let html = ''
+    //     options.forEach(option => {
+    //         let htmlSegment = `<option>`+option+`</option>`;
+    //         html += htmlSegment;
+    //     });
+    //     console.log(html)
+    //     return html
+    // };
+
+    // let optionsHTML = renderOptions().then(function(result) {return result;});
+    // console.log(optionsHTML);
+
+
+    function renderOptions() {
+        let options = ['Bills', 'Eating Out', 'Entertainment', 
+                       'Family', 'Finances', 'Gifts (Giving)', 
+                       'Gifts (Receiving)', 'Groceries', 'Holidays', 
+                       'Salary', 'Personal Care', 'Savings', 'Shopping', 
+                       'Transfers', 'Transport', 'General (Income)', 
+                       'General (Expense)'];
+        let html = '';
+        options.forEach(option => {
+            let htmlSegment = `<option>`+option+`</option>`;
+            html += htmlSegment;
+        });
+        return html;
+    }
+    
+
+    let optionsHTML = renderOptions();
+
+    function renderAllOptions(id, currentCategory) {
+        
+        let html = `<center><select name="category" id=`+id+`><option selected>`+currentCategory+`</option>`+optionsHTML+`</select></center>`;
+        // console.log(html)
+        return html;
     };
 
-    new gridjs.Grid({
+    function updateCategory(cat, id) {
+        fetch('/api/data/update', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: 
+            JSON.stringify({'category':cat, 'id':id}),
+            }).then()
+    };
+
+    const grid = new gridjs.Grid({
         columns: [
-        { id: 'transaction_id', name: 'Transaction ID', 'hidden': true},
+        { id: 'transaction_id', name: 'Transaction ID', 'hidden': true },
         { id: 'date', name: 'Date' },
-        { id: 'description', name: 'Description' },
+        { id: 'description', name: 'Description', width: '50%'},
         { id: 'amount', name: 'Amount', formatter: (cell) => `£${cell}` },
-        { id: 'category', name: 'Category', 'attributes': editableCellAttributes },
         {
-            name: 'Actions',
-            formatter: (cell, row) => {
-              return gridjs.h('button', {
-                className: 'py-2 mb-4 px-4 border rounded-md text-white bg-blue-600',
-                onClick: () => fetch('/api/data/delete', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        id: row.cells[0].data
-                    })
-                })
-              }, 'Remove');
-            }
+            id: 'category',
+            name: 'Category',
+            formatter: (cell, row) => gridjs.html(renderAllOptions(row.cells[0].data, cell)),
+            attributes: (cell, row) => {
+                if (cell) {
+                    return {
+                        'data-cell-content':cell,
+                        'onchange': (e) => updateCategory(e.target.value, row.cells[0].data)
+                        }
+                    };
+                }
         },
-        
+        {
+            id: 'checkbox',
+            name: 'Remove',
+            width: '10%',
+            plugin: {
+                component: gridjs.plugins.selection.RowSelection,
+                props: {
+                    id: (row) => row.cell(0).data
+                }
+            }
+        }
         ],
         server: {
             url: '/api/data',
             then: results => results
         },
         search: true,
+        autoWidth: false,
+        width: '95%',
         sort: true,
+        resizable: true,
         pagination: {
             limit: 10
         },
         fixedHeader: true,
-        // height: '400px'
     }).render(tableDiv);
 
+
+    const deleteButton = document.getElementById('delete');
+
+    deleteButton.addEventListener('click', ev => {
+        const checkboxPlugin = grid.config.plugin.get('checkbox');
+        const transactionsToDelete = checkboxPlugin.props.store.state;
+        console.log(transactionsToDelete);
+
+        if (Object.values(transactionsToDelete) != NaN) {
+            fetch('/api/data/delete', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: 
+                JSON.stringify(Object.values(transactionsToDelete)[0]),
+            }).then(() => {window.location.reload();})
+        }
+    });
+
     
+
+ 
+    // for (const elem of selectElems) {
+    //     const status = 
+    //     elem.getAttribute('data-status');
+    //     console.log(status);
+    //     if (status === 'open') {
+    //         console.log(elem.item(0));
+
+    //     }
+    // };
+   
     // https://blog.miguelgrinberg.com/post/beautiful-flask-tables-part-2
 
     let savedValue;
 
-        tableDiv.addEventListener('focusin', ev => {
-        if (ev.target.tagName === 'TD') {
-            savedValue = ev.target.textContent;
+        tableDiv.addEventListener('change', ev => {
+        if (ev.target.tagName === 'select') {
+            savedValue = ev.target.value;
             console.log(savedValue);
         }
         });
 
         tableDiv.addEventListener('focusout', ev => {
-        if (ev.target.tagName === 'TD') {
+        if (ev.target.tagName === 'select') {
             if (savedValue !== ev.target.textContent) {
             fetch('/api/data/update', {
                 method: 'POST',
@@ -77,18 +167,28 @@ document.addEventListener("DOMContentLoaded", function(){
         }
         });
 
-        tableDiv.addEventListener('keydown', ev => {
-        if (ev.target.tagName === 'TD') {
-            savedValue = ev.target.textContent;
-            console.log(savedValue);
-            if (ev.key === 'Escape') {
-                ev.target.textContent = savedValue;
-                ev.target.blur();
-            }
-            else if (ev.key === 'Enter') {
-                ev.preventDefault();
-                ev.target.blur();
-            }
-        }
-        });
+//         tableDiv.addEventListener('keydown', ev => {
+//         if (ev.target.tagName === 'TD') {
+//             savedValue = ev.target.textContent;
+//             console.log(savedValue);
+//             if (ev.key === 'Escape') {
+//                 ev.target.textContent = savedValue;
+//                 ev.target.blur();
+//             }
+//             else if (ev.key === 'Enter') {
+//                 ev.preventDefault();
+//                 ev.target.blur();
+//             }
+//         }
+//         });
 });
+// setTimeout(() => {
+
+//     const selectElems = document.getElementsByTagName('select');
+//     console.log(selectElems);
+//     for (const elem of selectElems) {
+//         elem.addEventListener('click', function () {
+//             console.log(elem)
+//         });
+//     };
+// }, 0);

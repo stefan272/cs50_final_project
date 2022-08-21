@@ -55,7 +55,7 @@ def allowed_file(filename, allowed_extensions):
 
 def format_date(date):
     # Format the date correctly (YYYY-mm-dd)
-    return parser.parse(date).date()
+    return parser.parse(date, dayfirst=True).date()
 
 def format_string(string):
     # Strip out any spaces from string

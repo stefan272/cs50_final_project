@@ -41,16 +41,16 @@ def after_request(response):
 
 @app.route('/')
 @helpers.login_required
-def index(): #TODO
+def index():
     
     # Create list of available years
-
-    # Get the oldest date from the transactions
-    oldestYear = database_queries.oldest_year(session['user_id'])
-
+    
     # Get current year
     currentYear = date.today().year
 
+    # Get the oldest date from the transactions
+    oldestYear = database_queries.oldest_year(session['user_id'])
+ 
     years = []
     for year in range(oldestYear, currentYear+1):
         years.append(year)
@@ -171,8 +171,9 @@ def add():
     if request.method == 'POST':
         
         # Define list of form fields
-        fields = ['date', 'desc', 'amount', 'category']
+        fields = ['date', 'description', 'amount', 'category']
         # Validate all fields are entered
+        print(request.form)
         entries = helpers.validate_entries(request.form, fields)
         if len(entries) != len(fields):
             flash("Enter all fields")
@@ -184,7 +185,7 @@ def add():
         entries['cat_id'] = res['cat_id']
         database_queries.add_transaction(entries, session['user_id'])
  
-        flash("Added!")
+        flash("Transaction Added!")
         return redirect('/add')
 
     # User reached route via GET (clicking a link or via redirect)
@@ -245,7 +246,7 @@ def upload():
         
     helpers.categorize(transactions)
 
-    flash('Added/Uploaded!')
+    flash('Transactions Uploaded!')
     return redirect('/add')
 
 
@@ -273,7 +274,7 @@ def data():
 def update():
     
     data = request.get_json()
-    print(data)
+    print(f"Update data: {data}")
     if 'id' not in data:
         return render_template('error.html')
 
@@ -288,28 +289,48 @@ def update():
     return '', 204
 
 
+@app.route('/api/data/categories')
+@helpers.login_required
+def category_return():
+
+    categories = database_queries.categories()
+    # print(categories)
+    cat_list=[]
+
+    for item in categories:
+        cat_list.append(item['category'])
+
+    print(cat_list)
+
+    return json.dumps(cat_list)
+
+
 @app.route('/api/data/delete', methods=['POST'])
 @helpers.login_required
-def delete():
-    # Allow manual transaction deletion
+def multi_delete():
+    
     data = request.get_json()
-    if 'id' not in data:
-        return render_template('error.html')
-
-    database_queries.delete_transaction(session['user_id'], data['id'])
+    print(data)
+    for id in request.get_json():
+        database_queries.delete_transaction(session['user_id'], id)
 
     return '', 204
+
+
+@app.route('/support')
+def support():
+    return render_template('support.html')
 
 
 if __name__ == '__main__':
     app.run(debug=True)   
 
+
 # TODO
-    # Create dummy data
     # Create more extensive categorization
     # Allow customer to add a category
         # if new category added, re-sort data
-    # Fix double post response when changing category
-    # Allow filtering of transactions by date/category
-
-# settings route
+    # For dashboard:
+        # Add list of top spends for the selected month
+        # Add more insights
+    # Fix display overspill for main div
