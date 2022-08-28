@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", function(){
         columns: [
         { id: 'transaction_id', name: 'Transaction ID', 'hidden': true },
         { id: 'date', name: 'Date' },
-        { id: 'description', name: 'Description', width: '50%'},
+        { id: 'description', name: 'Description'},
         { id: 'amount', name: 'Amount', formatter: (cell) => `£${cell}` },
         {
             id: 'category',
@@ -85,7 +85,7 @@ document.addEventListener("DOMContentLoaded", function(){
         {
             id: 'checkbox',
             name: 'Remove',
-            width: '10%',
+            // width: '12%',
             plugin: {
                 component: gridjs.plugins.selection.RowSelection,
                 props: {
@@ -99,16 +99,15 @@ document.addEventListener("DOMContentLoaded", function(){
             then: results => results
         },
         search: true,
-        autoWidth: false,
+        // autoWidth: true,
         width: '95%',
         sort: true,
-        resizable: true,
+        // resizable: true,
         pagination: {
             limit: 10
         },
         fixedHeader: true,
     }).render(tableDiv);
-
 
     const deleteButton = document.getElementById('delete');
 
@@ -127,19 +126,6 @@ document.addEventListener("DOMContentLoaded", function(){
         }
     });
 
-    
-
- 
-    // for (const elem of selectElems) {
-    //     const status = 
-    //     elem.getAttribute('data-status');
-    //     console.log(status);
-    //     if (status === 'open') {
-    //         console.log(elem.item(0));
-
-    //     }
-    // };
-   
     // https://blog.miguelgrinberg.com/post/beautiful-flask-tables-part-2
 
     let savedValue;
@@ -166,29 +152,4 @@ document.addEventListener("DOMContentLoaded", function(){
             savedValue = undefined;
         }
         });
-
-//         tableDiv.addEventListener('keydown', ev => {
-//         if (ev.target.tagName === 'TD') {
-//             savedValue = ev.target.textContent;
-//             console.log(savedValue);
-//             if (ev.key === 'Escape') {
-//                 ev.target.textContent = savedValue;
-//                 ev.target.blur();
-//             }
-//             else if (ev.key === 'Enter') {
-//                 ev.preventDefault();
-//                 ev.target.blur();
-//             }
-//         }
-//         });
 });
-// setTimeout(() => {
-
-//     const selectElems = document.getElementsByTagName('select');
-//     console.log(selectElems);
-//     for (const elem of selectElems) {
-//         elem.addEventListener('click', function () {
-//             console.log(elem)
-//         });
-//     };
-// }, 0);

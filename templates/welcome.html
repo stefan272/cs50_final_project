@@ -3,11 +3,34 @@
 {% block title %}
     Welcome
 {% endblock %}
-{% block main %}
-<div class="container-fluid welcome-title">
-    <h1 class="display-3">Welcome Page</h1>
-    <h3>Some details/images for the homepage about the website</p>
+{% block body %}
+<div class="welcomeLowerBanner">
+    <div class="lowerBannerBlock">
+        <img src="/static/images/bar-chart-business-analytics-statistics-svgrepo-com.svg" alt="chart">
+        <p>Visualise your spending</p>
+    </div>
+    <div class="lowerBannerBlock">
+        <img src="/static/images/robot-ai-svgrepo-com.svg" alt="robot-ai">
+        <p>Automatically categorise data</p>
+    </div>
+    <div class="lowerBannerBlock">
+        <img src="/static/images/csv-document-svgrepo-com.svg" alt="csv">
+        <p>Upload all of your data</p>
+    </div>
 </div>
+{% endblock %}
 
+{% block main %}
+<div class="welcome-title">
+    <div class="welcome-title-item">
+        <h2 class="display-3">Add, track, save</h2>
+    </div>
+    <div class="welcome-title-item">
+        <p class="lead">The best way to organise and manage your spending habits, anytime, anywhere!</p>
+    </div>
+    <div class="welcome-title-item">
+        <a class="btn btn-primary" href="/register">Sign up now!</a>
+    </div>
+</div>
 {% endblock %}
 

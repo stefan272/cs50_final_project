@@ -3,12 +3,12 @@ import csv
 import json
 import database_queries
 import helpers
+import secrets
 
 from flask import Flask, flash, redirect, render_template, request, session
 from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
-from textwrap import indent
 from datetime import date
 
 # Configure application
@@ -16,7 +16,7 @@ app = Flask(__name__)
 
 # Configure application
 app.config['TEMPLATES_AUTO_RELOAD'] = True # Ensure templates are reloaded
-app.config['SECRET_KEY'] = 'supersecretkey' # Set secret key for file upload
+app.config['SECRET_KEY'] = secrets.token_hex(16) # Set secret key for file upload
 app.config['UPLOAD_FOLDER'] = 'static/uploads' # Set file upload folder
 ALLOWED_EXTENSIONS = {'csv'}
 
@@ -117,7 +117,7 @@ def logout():
 
 
 @app.route('/register', methods=["GET", "POST"])
-def register(): #TODO - password validation
+def register():
     # Register new user
 
     # User reached route via POST (as by submitting a form via POST)
@@ -140,7 +140,7 @@ def register(): #TODO - password validation
         # Check the password length/character inclusion & matching
         if helpers.validate_password(entries['password'], entries['confirmation']) == False:
             flash("Invalid password")
-            redirect("/register")
+            return redirect('/register')
         else:
             # Hash the users given password
             pwhash = generate_password_hash(entries['password'], method='pbkdf2:sha256', salt_length=16)
@@ -158,7 +158,6 @@ def register(): #TODO - password validation
         return render_template('register.html')
 
 
-
 @app.route('/add', methods=['GET', 'POST'])
 @helpers.login_required
 def add():
@@ -173,7 +172,6 @@ def add():
         # Define list of form fields
         fields = ['date', 'description', 'amount', 'category']
         # Validate all fields are entered
-        print(request.form)
         entries = helpers.validate_entries(request.form, fields)
         if len(entries) != len(fields):
             flash("Enter all fields")
@@ -274,7 +272,6 @@ def data():
 def update():
     
     data = request.get_json()
-    print(f"Update data: {data}")
     if 'id' not in data:
         return render_template('error.html')
 
@@ -294,7 +291,7 @@ def update():
 def category_return():
 
     categories = database_queries.categories()
-    # print(categories)
+
     cat_list=[]
 
     for item in categories:
@@ -330,7 +327,4 @@ if __name__ == '__main__':
     # Create more extensive categorization
     # Allow customer to add a category
         # if new category added, re-sort data
-    # For dashboard:
-        # Add list of top spends for the selected month
-        # Add more insights
     # Fix display overspill for main div

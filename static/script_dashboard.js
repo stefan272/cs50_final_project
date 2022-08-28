@@ -98,6 +98,7 @@ function updateChart() {
             e.sum = (Math.abs(e.sum.toFixed(2)));
             e.avg = Math.abs((e.avg).toFixed(2));
         });
+
         
         // Sort the data by the current months amounts
         groupedThisMonthData.sort((a, b) => a.sum - b.sum);
@@ -110,28 +111,37 @@ function updateChart() {
         // Globally update the chart
         expensesBar.update();
 
-		// Insights
-		// Monthly spends
-		console.log(groupedThisMonthData);
-		var monthlyTotal = 0;
-		var averageTotal = 0;
-		groupedThisMonthData.forEach(e => {
-			monthlyTotal += e.sum;
-			averageTotal += e.avg;
-		});
-		console.log(monthlyTotal);
-		console.log(averageTotal);
-		document.getElementById('averageMonth').innerHTML = '£'+averageTotal.toFixed(2);
-		document.getElementById('currentMonth').innerHTML = '£'+monthlyTotal.toFixed(2);
-    const difference = (monthlyTotal - averageTotal).toFixed(2);
-    console.log(difference)
-    if (difference >= 0) {
-      document.getElementById('difference').innerHTML = '£'+Math.abs(difference) + ' more ';
-    }
-    else {
-      document.getElementById('difference').innerHTML = '£'+ Math.abs(difference) + ' less ';
-    }
-    });
+        // Insights
+
+        // Monthly spends
+        // Get the total spending of an average month from the last year
+        var averageTotal = groupedYearlyData.reduce((total, category) => total + category.sum, 0);
+        averageTotal = Math.abs(averageTotal / 12);
+
+        // Get the total spending of the current month
+        var monthlyTotal = groupedThisMonthData.reduce((total, category) => total + category.sum, 0);
+
+        // Update the HTML elements
+        document.getElementById('averageMonth').innerHTML = '£'+averageTotal.toFixed(2);
+        document.getElementById('currentMonth').innerHTML = '£'+monthlyTotal.toFixed(2);
+        
+        // Difference
+        // Get the difference between the average and current months
+        const difference = (monthlyTotal - averageTotal).toFixed(2);
+        // Update HTML elements depending on difference value
+        if (difference >= 0) {
+        document.getElementById('difference').innerHTML = '£'+Math.abs(difference) + ' more ';
+        }
+        else {
+        document.getElementById('difference').innerHTML = '£'+ Math.abs(difference) + ' less ';
+        }
+        
+        // Highest spend
+        // Sort the months data highest to lowest
+        thisMonthsData.sort((a, b) => a.amount - b.amount);
+        // Update the HTML element
+        document.getElementById('highest').innerHTML = '£' + Math.abs(thisMonthsData[0]['amount']) + ' (' + thisMonthsData[0]['description'] + ')';
+	  });
 };
 
 //   Chart Setup =========================
@@ -150,6 +160,9 @@ const dataExpenses = {
       order: 1,
 	  datalabels: {
 		  display: false,
+      anchor: 'end',
+      align: 'top',
+
 	  },
       backgroundColor: [
         'rgba(126, 142, 249, 0.8)',
@@ -179,6 +192,7 @@ const dataExpenses = {
       }
     },{
       label: 'Average',
+      hidden: true,
       data: [],
       order: 2,
 	  datalabels: {
@@ -196,7 +210,6 @@ const dataExpenses = {
       backgroundColor: [
         'transparent',
       ],
-	//   borderDash: [1,1],
       borderColor: [
         'rgba(255, 0, 0, .75)',
       ],
@@ -229,9 +242,9 @@ const configExpensesBar = {
 			},
 			y: {
 				ticks: {
-                    // Include a dollar sign in the ticks
-                    callback: function(value) {
-                        return '£' + value;
+          // Include a pound sign in the ticks
+          callback: function(value) {
+              return '£' + value;
 					}
 				},
 				grace: '5%',

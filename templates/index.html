@@ -41,18 +41,30 @@
         <div class="card">
             <div class="chart-canvas">
                 <h3 class="display-5">Insights</h3>
-                <div class="dashboardInsight">
-                    <div class="dashboardInsightBlock">
-                        <h3>Average</h3>
-                        <p id="averageMonth"></p>
+                <div class="wrapper">
+                    <div class="wrapper">
+                        <div class="dashboardInsightBlock">
+                            <h3>Average</h3>
+                            <p id="averageMonth"></p>
+                        </div>
+                        <div class="dashboardInsightBlock">
+                            <h3>Current</h3>
+                            <p id="currentMonth"></p>
+                        </div>
                     </div>
-                    <div class="dashboardInsightBlock">
-                        <h3>Current</h3>
-                        <p id="currentMonth"></p>
-                    </div>
-                    <div class="dashboardInsightBlock">
-                        <h3>Difference</h3>
-                        <p>You've spent <span id="difference"></span> than the average.</p>
+                    <div class="dashboardInsight">
+                        <ul>
+                            <li>
+                                <div class="dashboardInsightBlock">
+                                    <p>You've spent <span id="difference"></span> than the average.</p>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="dashboardInsightBlock">
+                                    <p>You're highest spend was <span id="highest"></span></p>
+                                </div>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>

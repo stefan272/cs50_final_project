@@ -4,7 +4,6 @@ import string
 import sys
 import csv
 from faker import Faker
-from datetime import datetime
 
 # Configure SQLite database
 def dict_factory(cursor, row):
