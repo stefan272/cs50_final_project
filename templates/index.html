@@ -5,6 +5,19 @@
 {% endblock %}
 {% block main %}
 <h1 class="display-2">Financial Dashboard</h1>
+
+<div class="dashboard-block">
+    <div class="dashboardBanner">  
+        <h2 class="display-4">Balance</h2>
+    </div>
+    <div class="dashboard-cards-large">
+        <div class="card">
+            <div class="chart-canvas">
+                <canvas id="balanceBar"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="dashboard-block">
     <div class="dashboardBanner">  
         <h2 class="display-4">Expenses</h2>
@@ -32,7 +45,7 @@
             </select>
         </div>
     </div>
-    <div class="dashboard-cards">
+    <div class="dashboard-cards-small">
         <div class="card">
             <div class="chart-canvas">
                 <canvas id="expensesBar"></canvas>

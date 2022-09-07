@@ -1,4 +1,5 @@
 import sqlite3
+import threading
 from datetime import datetime, date
 
 # Configure SQLite database
@@ -10,6 +11,8 @@ def dict_factory(cursor, row):
 connection = sqlite3.connect('final.db', check_same_thread=False)
 connection.row_factory = dict_factory
 cursor = connection.cursor()
+
+lock = threading.Lock()
 
 def add_transaction(transaction, user_id):
     # Add/update a transaction for the user
@@ -48,7 +51,7 @@ def oldest_year(user_id):
                                       FROM transactions 
                                      WHERE user_id=?""",
                                            (user_id,)).fetchone()
-    print(oldest_date)
+
     if oldest_date['MIN(date)'] == None:
         return date.today().year
     else: 
@@ -75,14 +78,20 @@ def create_user(entries):
 
 def all_transactions(user_id):
     # Query all transactions for a user
-    return cursor.execute("""SELECT date, amount, description, categories.category, transaction_id, categories.type
-                               FROM transactions
-                                    JOIN categories
-                                    ON transactions.cat_id = categories.cat_id
-                              WHERE user_id = ?
-                              ORDER BY date 
-                                    DESC""", 
-                                    (user_id,)).fetchall()
+    try:
+        lock.acquire(True)
+        res = cursor.execute("""SELECT date, amount, description, categories.category, transaction_id, categories.type
+                                FROM transactions
+                                        JOIN categories
+                                        ON transactions.cat_id = categories.cat_id
+                                WHERE user_id = ?
+                                ORDER BY date 
+                                        DESC""", 
+                                        (user_id,)).fetchall()
+    finally:
+        lock.release()
+
+    return res
 
 
 def update_category(cat_id, transaction_id):
@@ -104,3 +113,19 @@ def delete_transaction(user_id, transaction_id):
                                       (user_id, transaction_id))
 
     return '', 204
+
+def update_balance(user_id, balance):
+    # Update the current balance of the user
+    with connection:
+            cursor.execute("""INSERT or REPLACE INTO balances (user_id, current_balance)
+                                              VALUES (?, ?)""",
+                                                     (user_id, balance))
+    return '', 204
+
+
+def get_balance(user_id):
+    # Get the current users balance
+    return cursor.execute("""SELECT current_balance 
+                               FROM balances 
+                              WHERE user_id = ?""", 
+                                    (user_id,)).fetchone()

@@ -1,7 +1,7 @@
 import os
 import csv
 import json
-import database_queries
+import database_queries as dq
 import helpers
 import secrets
 
@@ -10,6 +10,8 @@ from flask_session import Session
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 from datetime import date
+from operator import itemgetter
+
 
 # Configure application
 app = Flask(__name__)
@@ -49,7 +51,7 @@ def index():
     currentYear = date.today().year
 
     # Get the oldest date from the transactions
-    oldestYear = database_queries.oldest_year(session['user_id'])
+    oldestYear = dq.oldest_year(session['user_id'])
  
     years = []
     for year in range(oldestYear, currentYear+1):
@@ -88,7 +90,7 @@ def login():
             return redirect('/register')
 
         # Query database for username
-        rows = database_queries.username_check(entries['username'])
+        rows = dq.username_check(entries['username'])
 
         # Ensure username and password are valid
         if len(rows) != 1 or not check_password_hash(rows[0]['hash'], entries['password']):
@@ -132,7 +134,7 @@ def register():
             return redirect('/register')
 
         # Check the username is not already taken
-        rows = database_queries.username_check(entries['username'])
+        rows = dq.username_check(entries['username'])
         if len(rows) > 0:
             flash("Username already taken")
             return redirect('/register')
@@ -147,7 +149,10 @@ def register():
             # Add hashed password to entries
             entries['hash'] = pwhash
             # Create user and store new user ID
-            session['user_id'] = database_queries.create_user(entries)
+            session['user_id'] = dq.create_user(entries)
+
+        # Initiate the users balance
+        dq.update_balance(session['user_id'], 0)
 
         # Return back to the homescreen
         flash("Registered!")
@@ -164,7 +169,7 @@ def add():
     # Allow user to add a transaction
 
     # Query list of available categories
-    categories = database_queries.categories()
+    categories = dq.categories()
     
     # User reached route via POST (form submission)
     if request.method == 'POST':
@@ -178,11 +183,15 @@ def add():
             return redirect('/register')
         
         # Get the id for the given category
-        res = database_queries.category_to_id(entries['category'])
+        res = dq.category_to_id(entries['category'])
         # Add transaction to database
         entries['cat_id'] = res['cat_id']
-        database_queries.add_transaction(entries, session['user_id'])
- 
+        dq.add_transaction(entries, session['user_id'])
+
+        # Update the users balance
+        current = dq.get_balance(session['user_id'])['current_balance']
+        dq.update_balance(session['user_id'], current + float(entries['amount']))
+
         flash("Transaction Added!")
         return redirect('/add')
 
@@ -261,7 +270,7 @@ def history():
 def data():
     # Query the users transaction data
 
-    transactions = database_queries.all_transactions(session['user_id'])
+    transactions = dq.all_transactions(session['user_id'])
 
     # print(json.dumps(transactions, indent=2))
     return json.dumps(transactions)
@@ -277,8 +286,8 @@ def update():
 
     # Query for new cat id
     try:
-        new_categoryID = database_queries.category_to_id(data['category'])
-        database_queries.update_category(new_categoryID['cat_id'], data['id'])
+        new_categoryID = dq.category_to_id(data['category'])
+        dq.update_category(new_categoryID['cat_id'], data['id'])
     except TypeError:
         flash("Invalid Category")
         return redirect('/history'), 400
@@ -290,7 +299,7 @@ def update():
 @helpers.login_required
 def category_return():
 
-    categories = database_queries.categories()
+    categories = dq.categories()
 
     cat_list=[]
 
@@ -309,7 +318,7 @@ def multi_delete():
     data = request.get_json()
     print(data)
     for id in request.get_json():
-        database_queries.delete_transaction(session['user_id'], id)
+        dq.delete_transaction(session['user_id'], id)
 
     return '', 204
 
@@ -317,6 +326,67 @@ def multi_delete():
 @app.route('/support')
 def support():
     return render_template('support.html')
+
+@app.route('/settings', methods=['GET', 'POST'])
+@helpers.login_required
+def settings():
+
+    if request.method == 'POST':
+        fields = ['balance']
+        entries = helpers.validate_entries(request.form, fields)
+        if len(entries) != len(fields):
+            flash("Enter all fields")
+            return redirect('/settings')
+        print(entries)
+        dq.update_balance(session['user_id'], entries['balance'])
+
+        flash("Balance Updated!")
+        return redirect('/settings')
+    else:
+        return render_template('settings.html', balance=dq.get_balance(session['user_id']))
+
+
+@app.route('/api/data/balance')
+@helpers.login_required
+def balance_data():
+
+        # get list of all transactions
+        data = dq.all_transactions(session['user_id'])
+        # from data, get a list of all the unique months
+        months = set()
+        for item in data:
+            months.add(item['date'][:-3])
+        # Initiate the sorted data
+        grouped = []
+        for month in months:
+            entry = {}
+            entry['date'] = month
+            entry['total'] = 0
+            grouped.append(entry)
+        # Sum up the monthly totals
+        for entry in data:
+            new_date = entry['date'][:-3]
+            def find(lst, key, value):
+                for i, dic in enumerate(lst):
+                    if dic[key] == value:
+                        return i
+                return -1
+            index = find(grouped, 'date', new_date)
+            grouped[index]['total'] += entry['amount']
+            grouped[index]['total'] = round(grouped[index]['total'], 2)
+        # Sort the list
+        sorted_grouped = sorted(grouped, key=itemgetter('date'), reverse=True)
+        # Add the balances
+
+        # Initiate current balance
+        balance = dq.get_balance(session['user_id'])['current_balance']
+        # Calcuate the balances after each transaction
+        for item in sorted_grouped:
+            item['balance'] = round(balance - item['total'], 2)
+            balance = item['balance']
+        # print(sorted_grouped)
+        reversed = sorted(sorted_grouped, key=itemgetter('date'), reverse=False)
+        return json.dumps(reversed)
 
 
 if __name__ == '__main__':
@@ -328,3 +398,5 @@ if __name__ == '__main__':
     # Allow customer to add a category
         # if new category added, re-sort data
     # Fix display overspill for main div
+    # Fix dual api calls into one call?
+    # Add balance adjustment during csv import

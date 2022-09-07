@@ -1,10 +1,11 @@
+ 
 main {
     background-color: rgba(255,255,255,0.75);
     -webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;
     background-size: cover;
-    height: 100vh;
+    /* height: 100vh; */
     width: 100vw;
     margin: 0px;
 }
@@ -48,7 +49,7 @@ nav ul li::after {
     -moz-background-size: cover;
     -o-background-size: cover;
     background-size: cover;
-    height: 100vh;
+    /* height: 100vh; */
     width: 100vw;
     margin: 0px;
 }
@@ -100,7 +101,7 @@ nav ul li::after {
     color: #2e944b;
     font-weight: bold;
 }
-.dashboard-cards {
+.dashboard-cards-small {
     display: grid;
     grid-template-columns: 1fr 1fr;
     margin: 0;
@@ -108,9 +109,17 @@ nav ul li::after {
     padding-bottom: 50px;
     gap: 50px;
 }
+.dashboard-cards-large {
+    display: grid;
+    grid-template-columns: 1fr;
+    margin: 0;
+    padding-top: 10px;
+    padding-bottom: 50px;
+    gap: 50px;
+}
 
 @media only screen and (max-width: 1200px) {
-    .dashboard-cards {
+    .dashboard-cards-small {
         grid-template-columns: 1fr;
     }
     .form-box {
@@ -122,7 +131,7 @@ nav ul li::after {
     width: 90%;   
     background-color: white;
     border-radius: 10px;
-    border-color:rgba(27, 199, 53, 0.8);
+    border-color:rgba(126, 142, 249, 0.8);
     justify-self: center;
 }
 

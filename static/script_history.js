@@ -100,9 +100,9 @@ document.addEventListener("DOMContentLoaded", function(){
         },
         search: true,
         // autoWidth: true,
-        width: '95%',
+        // width: '95%',
         sort: true,
-        // resizable: true,
+        resizable: true,
         pagination: {
             limit: 10
         },

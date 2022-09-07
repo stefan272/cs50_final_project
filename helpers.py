@@ -22,8 +22,7 @@ def validate_entries(form, fields):
     
     entries = {}
     for field in fields:
-        if not form[field]:
-            
+        if not form[field]: 
             break
         else:
             entries[field] = form[field]

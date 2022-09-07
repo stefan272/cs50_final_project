@@ -60,23 +60,23 @@ function updateChart() {
         const url = '/api/data';
         const response = await fetch(url);
         const data = await response.json();
-        console.log(data);
+        // console.log(data);
         return data;
     };
     
     fetchData().then(data => {
         // Filter the data to just show the expenses
         var expensesData = data.filter((e) => e.type == 'Expense');
-        console.log(expensesData);
+        // console.log(expensesData);
 
-		// Filter out the data older than 1 year
+		    // Filter out the data older than 1 year
         var lastYearDate = lastYear()
         var lastYearsData = expensesData.filter((e) => e.date >= lastYearDate);
-        console.log(lastYearsData);
+        // console.log(lastYearsData);
 
         // Group the yearly data by category
         var groupedYearlyData = groupByCategory(lastYearsData);
-        console.log(groupedYearlyData);
+        // console.log(groupedYearlyData);
 
         // Group the monthly data by category
         var startMonth = monthStart();
@@ -102,7 +102,7 @@ function updateChart() {
         
         // Sort the data by the current months amounts
         groupedThisMonthData.sort((a, b) => a.sum - b.sum);
-        console.log(groupedThisMonthData)
+        // console.log(groupedThisMonthData)
 
         // Update the data field in the grid
         expensesBar.config.data.datasets[0].data = groupedThisMonthData;
@@ -140,6 +140,11 @@ function updateChart() {
         // Sort the months data highest to lowest
         thisMonthsData.sort((a, b) => a.amount - b.amount);
         // Update the HTML element
+        // if no amount this month, return 0
+        // if (thisMonthsData[0]['amount'] === 'undefined') {
+        //   return 0
+        // };
+        console.log(thisMonthsData[0]['amount']);
         document.getElementById('highest').innerHTML = '£' + Math.abs(thisMonthsData[0]['amount']) + ' (' + thisMonthsData[0]['description'] + ')';
 	  });
 };
@@ -260,6 +265,129 @@ const expensesBar = new Chart(
   configExpensesBar
 );
 
+
+
 //   =====================================
+// Fetch block
+function updateBalanceChart() {
+  async function fetchData() {
+      const url = '/api/data/balance';
+      const response = await fetch(url);
+      const data = await response.json();
+      console.log(data);
+      return data;
+  };
+  
+  fetchData().then(data => {
+      data.sort((a, b) => b.date - a.date);
+      console.log(data);
+      // Update the data field in the grid
+      balanceBar.config.data.datasets[0].data = data;
+      balanceBar.config.data.datasets[1].data = data;
+
+      // Globally update the chart
+      balanceBar.update();
+
+  });
+};
+
+//   Chart Setup =========================
+
+Chart.register(ChartDataLabels);
+
+//   Bar chart============================
+
+// Setup 
+const dataBalance = {
+  // labels: [],
+  datasets: [{
+    label: 'Total',
+    data: [],
+  datalabels: {
+    display: false,
+    anchor: 'end',
+    align: 'top',
+
+  },
+    backgroundColor: [
+      'rgba(126, 142, 249, 0.8)',
+      'rgba(145, 126, 249, 0.8)', 
+      'rgba(164, 110, 249, 0.8)',
+      'rgba(184, 95, 249, 0.8)', 
+      'rgba(204, 76, 250, 0.8)',
+      'rgba(144, 117, 185, 0.8)',
+      'rgba(118, 137, 150, 0.8)',
+      'rgba(95, 160, 110, 0.8)',
+      'rgba(27, 199, 53, 0.8)'
+    ],
+    borderColor: [
+      'rgba(126, 142, 249, 1)',
+      'rgba(145, 126, 249, 1)', 
+      'rgba(164, 110, 249, 1)',
+      'rgba(184, 95, 249, 1)', 
+      'rgba(204, 76, 250, 1)',
+      'rgba(144, 117, 185, 1)',
+      'rgba(118, 137, 150, 1)',
+      'rgba(95, 160, 110, 1)',
+      'rgba(27, 199, 53, 1)'
+    ],
+    borderWidth: 1,
+    parsing: {
+        yAxisKey: 'total'
+    }
+  },{
+    label: 'Balance',
+    data: [],
+    type: 'line',
+    order: 1,
+  datalabels: {
+    display: false,
+    anchor: 'end',
+    align: 'top',
+
+  },
+    backgroundColor: ['rgba(126, 142, 249, 0.8)'],
+    tension: 0.4,
+    parsing: {
+        yAxisKey: 'balance'
+    }
+  },
+]
+};
+
+// config - bar chart
+const configBalanceBar = {
+type: 'bar',
+data: dataBalance,
+options: {
+  plugins: [ChartDataLabels],
+  parsing: {
+    xAxisKey: 'date'
+  },
+  responsive: true,
+  scales: {
+    x: {
+      stacked: true
+    },
+    y: {
+      ticks: {
+        // Include a pound sign in the ticks
+        callback: function(value) {
+            return '£' + value;
+        }
+      },
+      grace: '5%',
+      beginAtZero: true,
+    }
+  }
+}
+};
+
+// render bar chart block
+const balanceBar = new Chart(
+document.getElementById('balanceBar'),
+configBalanceBar
+);
 
 document.addEventListener("DOMContentLoaded", updateChart());
+document.addEventListener("DOMContentLoaded", updateBalanceChart());

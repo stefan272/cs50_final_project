@@ -45,6 +45,16 @@ FOREIGN KEY (user_id) REFERENCES users(user_id),
 FOREIGN KEY (cat_id) REFERENCES categories(cat_id)
 );
 
+-- Create user balance table
+CREATE TABLE IF NOT EXISTS balances (
+user_id INTEGER  UNIQUE NOT NULL,
+current_balance INTEGER,
+savings INTEGER,
+house_savings INTEGER,
+car_savings INTEGER,
+investments INTEGER,
+FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
 
 -- Insert global categories data
 INSERT INTO categories (category, type)
