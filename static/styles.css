@@ -1,22 +1,21 @@
  
 main {
-    background-color: rgba(255,255,255,0.75);
+    overflow: auto;
     -webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;
     background-size: cover;
-    /* height: 100vh; */
     width: 100vw;
     margin: 0px;
 }
 nav .navbar-brand {
     font-size: 30pt;
 }
-nav .navbar-brand .blue {
-    color: rgba(255, 255, 255, 0.9);
+nav .navbar-brand .brand-color {
+    color: rgba(101, 101, 101, 0.85);  
 }
 .nav-bg {
-    background: linear-gradient(235deg, rgba(27, 199, 53, 0.8) 0%, rgba(204, 76, 250, 0.8) 40%, rgba(126, 142, 249, 0.8) 100%);
+    background: linear-gradient(235deg, rgba(36, 116, 244, 0.9) 0%, rgba(36, 116, 244, 0.7) 40%, rgba(36, 116, 244, 0.5) 100%);
 }
 nav ul li {
     list-style: none;
@@ -24,9 +23,9 @@ nav ul li {
     margin: 0 20px;
     position: relative;
 }
-nav ul li a {
+nav ul li a{
     text-decoration: none;
-    color: rgb(131,58,180);
+    color: rgb(229, 166, 41);
     text-transform: uppercase;
     font-size: 14pt;
 }
@@ -34,7 +33,7 @@ nav ul li::after {
     content: '';
     height: 2px;
     width: 0;
-    background: rgb(131,58,180);
+    background: rgb(229, 166, 41);
     position: absolute;
     left: 0;
     bottom: 0;
@@ -44,7 +43,7 @@ nav ul li::after {
     width: 100%;
 }
 .welcome-bg {
-    background: url(images/charts.jpeg) no-repeat center center fixed; 
+    background: url(images/charts.jpg) no-repeat center center fixed; 
     -webkit-background-size: cover;
     -moz-background-size: cover;
     -o-background-size: cover;

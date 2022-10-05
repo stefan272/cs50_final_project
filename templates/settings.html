@@ -5,7 +5,7 @@
 {% endblock %}
 {% block main %}
 <form method="post" action="/settings">
-    <input type="number" name="balance">
+    <input type="number" name="balance" step=".01">
     <button type="submit">Submit</button>
 </form>
 <div>
