@@ -125,10 +125,16 @@ def update_balance(user_id, balance):
 
 def get_balance(user_id):
     # Get the current users balance
-    return cursor.execute("""SELECT current_balance 
+    try:
+        lock.acquire(True)
+        res = cursor.execute("""SELECT current_balance 
                                FROM balances 
                               WHERE user_id = ?""", 
                                     (user_id,)).fetchone()
+    finally:
+        lock.release()
+    
+    return res
 
 
 def get_password(user_id):

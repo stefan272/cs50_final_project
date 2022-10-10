@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", function(){
         { id: 'transaction_id', name: 'Transaction ID', 'hidden': true },
         { id: 'date', name: 'Date' },
         { id: 'description', name: 'Description'},
-        { id: 'amount', name: 'Amount', formatter: (cell) => `£${cell}` },
+        { id: 'amount', name: 'Amount', width: '20%', formatter: (cell) => `£${cell}` },
         {
             id: 'category',
             name: 'Category',
@@ -85,7 +85,7 @@ document.addEventListener("DOMContentLoaded", function(){
         {
             id: 'checkbox',
             name: 'Remove',
-            // width: '12%',
+            width: '15%',
             plugin: {
                 component: gridjs.plugins.selection.RowSelection,
                 props: {
@@ -99,14 +99,25 @@ document.addEventListener("DOMContentLoaded", function(){
             then: results => results
         },
         search: true,
-        // autoWidth: true,
+        autoWidth: true,
         // width: '95%',
         sort: true,
-        resizable: true,
+        // resizable: true,
         pagination: {
             limit: 10
         },
-        fixedHeader: true,
+        // fixedHeader: true,
+        style: {
+            th: {
+                'background-color': 'rgba(74, 102, 172, 0.5)',
+                color: '#000',
+                'text-align': 'center'
+              },
+            td: {
+                'text-align': 'left',
+                'word-break': 'break-word'
+            }
+        }
     }).render(tableDiv);
 
     const deleteButton = document.getElementById('delete');

@@ -78,7 +78,7 @@ VALUES
 ('General (Expense)', 'Expense');
 
 -- Insert global assignments data
-INSERT INTO global_assignments (cat_id, keyword)
+INSERT or REPLACE INTO global_assignments (cat_id, keyword)
 VALUES
 (1, 'energy'),
 (1, 'british gas'),
@@ -108,9 +108,27 @@ VALUES
 (15, 'metrolink'),
 (15, 'bus'),
 (15, 'fuel'),
+(1, 'apple'),
+(1, 'adobe'),
+(1, 'o2'),
+(1, 'nabu casa'),
+(8, 'marks&spencer'),
+(15, 'tfgm'),
 (7, 'birthday gift'),
 (10, 'salary'),
-(10, 'paycheck');
+(10, 'paycheck'),
+(1, 'vodafone'),
+(1, 'three'),
+(1, 'tesco mobile'),
+(1, 'ee mobile'),
+(1, 'edf energy'),
+(1, 'eon'),
+(1, 'npower'),
+(2, 'mcdonalds'),
+(2, 'slug & lettuce'),
+(15, 'trainline'),
+(15, 'shell'),
+(15, 'esso');
 
 -- Query to see if desc inside user_assignments
 SELECT user_assignments.cat_id 

@@ -120,7 +120,7 @@ function updateChart() {
 
         // Get the total spending of the current month
         var monthlyTotal = groupedThisMonthData.reduce((total, category) => total + category.sum, 0);
-
+        console.log(monthlyTotal);
         // Update the HTML elements
         document.getElementById('averageMonth').innerHTML = '£'+averageTotal.toFixed(2);
         document.getElementById('currentMonth').innerHTML = '£'+monthlyTotal.toFixed(2);
@@ -129,23 +129,27 @@ function updateChart() {
         // Get the difference between the average and current months
         const difference = (monthlyTotal - averageTotal).toFixed(2);
         // Update HTML elements depending on difference value
-        if (difference >= 0) {
-        document.getElementById('difference').innerHTML = '£'+Math.abs(difference) + ' more ';
+        if (monthlyTotal == 0) {
+          document.getElementById('difference').innerHTML = "N/A"
+        }
+        else if (difference > 0) {
+        document.getElementById('difference').innerHTML = "You've spent " + '£'+Math.abs(difference) + ' more than the average';
         }
         else {
-        document.getElementById('difference').innerHTML = '£'+ Math.abs(difference) + ' less ';
-        }
+        document.getElementById('difference').innerHTML = "You've spent " + '£'+ Math.abs(difference) + ' less than the average';
+        };
         
         // Highest spend
         // Sort the months data highest to lowest
         thisMonthsData.sort((a, b) => a.amount - b.amount);
+        console.log(thisMonthsData[0]);
         // Update the HTML element
-        // if no amount this month, return 0
-        // if (thisMonthsData[0]['amount'] === 'undefined') {
-        //   return 0
-        // };
-        console.log(thisMonthsData[0]['amount']);
-        document.getElementById('highest').innerHTML = '£' + Math.abs(thisMonthsData[0]['amount']) + ' (' + thisMonthsData[0]['description'] + ')';
+        if (thisMonthsData[0] === undefined) {
+          document.getElementById('highest').innerHTML = "N/A"
+        }
+        else {
+          document.getElementById('highest').innerHTML = "You're highest spend was " + '£' + Math.abs(thisMonthsData[0]['amount']) + ' (' + thisMonthsData[0]['description'] + ')';
+        };
 	  });
 };
 
@@ -170,26 +174,24 @@ const dataExpenses = {
 
 	  },
       backgroundColor: [
-        'rgba(126, 142, 249, 0.8)',
-        'rgba(145, 126, 249, 0.8)', 
-        'rgba(164, 110, 249, 0.8)',
-        'rgba(184, 95, 249, 0.8)', 
-        'rgba(204, 76, 250, 0.8)',
-        'rgba(144, 117, 185, 0.8)',
-        'rgba(118, 137, 150, 0.8)',
-        'rgba(95, 160, 110, 0.8)',
-        'rgba(27, 199, 53, 0.8)'
+        'rgba(36, 40, 82, 0.8)',
+        'rgba(172, 202, 249, 0.8)', 
+        'rgba(74, 102, 172, 0.8)',
+        'rgba(99, 157, 209, 0.8)', 
+        'rgba(42, 127, 213, 0.8)',
+        'rgba(128, 142, 168, 0.8)',
+        'rgba(90, 162, 174, 0.8)',
+        'rgba(156, 144, 160, 0.8)'
       ],
       borderColor: [
-        'rgba(126, 142, 249, 1)',
-        'rgba(145, 126, 249, 1)', 
-        'rgba(164, 110, 249, 1)',
-        'rgba(184, 95, 249, 1)', 
-        'rgba(204, 76, 250, 1)',
-        'rgba(144, 117, 185, 1)',
-        'rgba(118, 137, 150, 1)',
-        'rgba(95, 160, 110, 1)',
-        'rgba(27, 199, 53, 1)'
+        'rgba(36, 40, 82, 1)',
+        'rgba(172, 202, 249, 1)', 
+        'rgba(74, 102, 172, 1)',
+        'rgba(99, 157, 209, 1)', 
+        'rgba(42, 127, 213, 1)',
+        'rgba(128, 142, 168, 1)',
+        'rgba(90, 162, 174, 1)',
+        'rgba(156, 144, 160, 1)'
       ],
       borderWidth: 1,
       parsing: {
@@ -280,7 +282,7 @@ function updateBalanceChart() {
   
   fetchData().then(data => {
       data.sort((a, b) => b.date - a.date);
-      console.log(data);
+      // console.log(data);
       // Update the data field in the grid
       balanceBar.config.data.datasets[0].data = data;
       balanceBar.config.data.datasets[1].data = data;
@@ -289,6 +291,11 @@ function updateBalanceChart() {
       balanceBar.update();
 
   });
+
+  // fetch('/api/data/balance', {method:'GET'})
+  // .then (data => {
+  //   console.log(data);
+  // });
 };
 
 //   Chart Setup =========================
@@ -310,26 +317,24 @@ const dataBalance = {
 
   },
     backgroundColor: [
-      'rgba(126, 142, 249, 0.8)',
-      'rgba(145, 126, 249, 0.8)', 
-      'rgba(164, 110, 249, 0.8)',
-      'rgba(184, 95, 249, 0.8)', 
-      'rgba(204, 76, 250, 0.8)',
-      'rgba(144, 117, 185, 0.8)',
-      'rgba(118, 137, 150, 0.8)',
-      'rgba(95, 160, 110, 0.8)',
-      'rgba(27, 199, 53, 0.8)'
+      'rgba(36, 40, 82, 0.8)',
+      'rgba(172, 202, 249, 0.8)', 
+      'rgba(74, 102, 172, 0.8)',
+      'rgba(99, 157, 209, 0.8)', 
+      'rgba(42, 127, 213, 0.8)',
+      'rgba(128, 142, 168, 0.8)',
+      'rgba(90, 162, 174, 0.8)',
+      'rgba(156, 144, 160, 0.8)'
     ],
     borderColor: [
-      'rgba(126, 142, 249, 1)',
-      'rgba(145, 126, 249, 1)', 
-      'rgba(164, 110, 249, 1)',
-      'rgba(184, 95, 249, 1)', 
-      'rgba(204, 76, 250, 1)',
-      'rgba(144, 117, 185, 1)',
-      'rgba(118, 137, 150, 1)',
-      'rgba(95, 160, 110, 1)',
-      'rgba(27, 199, 53, 1)'
+      'rgba(36, 40, 82, 1)',
+      'rgba(172, 202, 249, 1)', 
+      'rgba(74, 102, 172, 1)',
+      'rgba(99, 157, 209, 1)', 
+      'rgba(42, 127, 213, 1)',
+      'rgba(128, 142, 168, 1)',
+      'rgba(90, 162, 174, 1)',
+      'rgba(156, 144, 160, 1)'
     ],
     borderWidth: 1,
     parsing: {
@@ -389,5 +394,5 @@ document.getElementById('balanceBar'),
 configBalanceBar
 );
 
-document.addEventListener("DOMContentLoaded", updateChart());
 document.addEventListener("DOMContentLoaded", updateBalanceChart());
+document.addEventListener("DOMContentLoaded", updateChart());

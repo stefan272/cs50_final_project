@@ -60,7 +60,10 @@ def index():
     # Get the current month for the initial chart filter
     currentMonth = date.today().strftime('%b')
 
-    return render_template('index.html', currentMonth=currentMonth, currentYear=currentYear, years=years)
+    # Get current balance
+    balance = dq.get_balance(session['user_id'])
+
+    return render_template('index.html', currentMonth=currentMonth, currentYear=currentYear, years=years, balance=balance)
 
 
 @app.route('/welcome')
@@ -87,11 +90,10 @@ def login():
         entries = helpers.validate_entries(request.form, fields)
         if len(entries) != len(fields):
             flash("Enter all fields")
-            return redirect('/register')
+            return redirect('/login')
 
         # Query database for username
         rows = dq.username_check(entries['username'])
-
 # TODO this isn't working correctly
 
         # Ensure username and password are valid
@@ -274,7 +276,6 @@ def data():
 
     transactions = dq.all_transactions(session['user_id'])
 
-    # print(json.dumps(transactions, indent=2))
     return json.dumps(transactions)
 
 
@@ -420,19 +421,9 @@ def balance_data():
         for item in sorted_grouped:
             item['balance'] = round(balance - item['total'], 2)
             balance = item['balance']
-        # print(sorted_grouped)
         reversed = sorted(sorted_grouped, key=itemgetter('date'), reverse=False)
         return json.dumps(reversed)
 
 
 if __name__ == '__main__':
-    app.run(debug=True)   
-
-
-# TODO
-    # Create more extensive categorization
-    # Allow customer to add a category
-        # if new category added, re-sort data
-    # Fix display overspill for main div
-    # Fix dual api calls into one call?
-    # Add balance adjustment during csv import
+    app.run(debug=True)

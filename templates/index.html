@@ -1,13 +1,26 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Index
+    Dashboard
 {% endblock %}
 {% block main %}
 <h1 class="display-2">Financial Dashboard</h1>
-
 <div class="dashboard-block">
-    <div class="dashboardBanner">  
+    <div class="dashboard-banner">  
+        <h2 class="display-4">Overview</h2>
+    </div>
+    <div class="dashboard-cards-small">
+        <div class="wrapper">
+            <div class="dashboardInsightBlock">
+                <h3>Current Balance</h3>
+                <p class="lead">{{ balance.current_balance | gbp }}</p>
+                <a href="/settings">Want to change this?</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="dashboard-block">
+    <div class="dashboard-banner">  
         <h2 class="display-4">Balance</h2>
     </div>
     <div class="dashboard-cards-large">
@@ -19,7 +32,7 @@
     </div>
 </div>
 <div class="dashboard-block">
-    <div class="dashboardBanner">  
+    <div class="dashboard-banner">  
         <h2 class="display-4">Expenses</h2>
         <div>
             <select name="yearpicker" id="yearpicker" onchange="updateChart()">
@@ -69,12 +82,12 @@
                         <ul>
                             <li>
                                 <div class="dashboardInsightBlock">
-                                    <p>You've spent <span id="difference"></span> than the average.</p>
+                                    <p><span id="difference"></span></p>
                                 </div>
                             </li>
                             <li>
                                 <div class="dashboardInsightBlock">
-                                    <p>You're highest spend was <span id="highest"></span></p>
+                                    <p><span id="highest"></span></p>
                                 </div>
                             </li>
                         </ul>
