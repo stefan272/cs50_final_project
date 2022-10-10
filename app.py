@@ -92,6 +92,8 @@ def login():
         # Query database for username
         rows = dq.username_check(entries['username'])
 
+# TODO this isn't working correctly
+
         # Ensure username and password are valid
         if len(rows) != 1 or not check_password_hash(rows[0]['hash'], entries['password']):
             flash("Invalid credentials")
@@ -327,6 +329,7 @@ def multi_delete():
 def support():
     return render_template('support.html')
 
+
 @app.route('/settings', methods=['GET', 'POST'])
 @helpers.login_required
 def settings():
@@ -337,13 +340,46 @@ def settings():
         if len(entries) != len(fields):
             flash("Enter all fields")
             return redirect('/settings')
-        print(entries)
         dq.update_balance(session['user_id'], entries['balance'])
 
         flash("Balance Updated!")
         return redirect('/settings')
     else:
         return render_template('settings.html', balance=dq.get_balance(session['user_id']))
+
+
+@app.route("/password_change", methods=["POST"])
+@helpers.login_required
+def password_change():
+    """Change user password"""
+
+    fields = ['current', 'password', 'confirmation']
+    entries = helpers.validate_entries(request.form, fields)
+    if len(entries) != len(fields):
+        flash("Enter all fields")
+        return redirect('/settings')
+
+    # Ensure the new password matches the confirmation
+    if entries['password'] != entries['confirmation']:
+        flash("New password does not match")
+        return redirect('/settings')
+    # Ensure new password does not match current password
+    elif entries['password'] == entries['current']:
+        flash("New password cannot match current password")
+        return redirect('/settings')
+
+    # Validate the current password with the database
+    rows = dq.get_password(session['user_id'])
+    # If incorrect, give error
+    if not check_password_hash(rows['hash'], entries['current']):
+        flash("Current password incorrect")
+        return redirect('/settings')
+
+    # If correct, hash the new password and update the database
+    pwhash = generate_password_hash(entries['password'], method='pbkdf2:sha256', salt_length=16)
+    dq.update_password(session['user_id'], pwhash)
+    flash("Password change successful!")
+    return redirect('/settings')
 
 
 @app.route('/api/data/balance')

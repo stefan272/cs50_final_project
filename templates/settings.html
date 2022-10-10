@@ -4,16 +4,38 @@
     Settings
 {% endblock %}
 {% block main %}
-<form method="post" action="/settings">
-    <input type="number" name="balance" step=".01">
-    <button type="submit">Submit</button>
-</form>
-<div>
-    <p>
-        Current Balance:
-    </p>
-    <p>
-        {{ balance.current_balance | gbp }}
-    </p>
+<h1 class="display-4">Settings</h1>
+<div class="container-fluid mb-5">
+    <div class="form-box mx-auto">
+        <h2 class="display-5">Update Balance</h2>
+        <p>Current Balance: {{ balance.current_balance | gbp }}</p>
+        <form method="post" action="/settings">
+            <div class="form-entry">
+                <small for="amount">Enter your new balance</small>
+                <input type="number" class="form-control mx-auto w-auto" name="balance" placeholder={{ balance.current_balance | gbp }} step=".01" required>
+                <button type="submit" class="btn btn-primary mt-3">Submit</button>
+            </div>
+        </form>
+        <a href="/support">
+            <span>Why might you want to do this?</span>
+        </a>
+    </div>
+</div>
+<div class="container-fluid mb-5"></div>
+    <div class="form-box mx-auto">
+        <h2 class="display-5">Update Password</h2>
+        <form action="password_change" method="post">
+            <div class="mb-3 mt-3">
+                <input autocomplete="off" class="form-control mx-auto w-auto" id="current" name="current" placeholder="Current Password" type="password" required>
+            </div>
+            <div class="mb-3">
+                <input class="form-control mx-auto w-auto" id="password" name="password" placeholder="New Password" type="password" required>
+            </div>
+            <div class="mb-3">
+                <input class="form-control mx-auto w-auto" id="confirmation" name="confirmation" placeholder="Re-enter password" type="password" required>
+            </div>
+            <button class="btn btn-primary" type="submit">Update</button>
+        </form>
+    </div>
 </div>
 {% endblock %}

@@ -87,6 +87,8 @@ nav ul li::after {
 }
 .support-block {
     background-color: rgba(200,200,200,0.25);
+    width: 50vw;
+    margin: auto;
     padding: 15px;
     border-radius: 25px;
 }

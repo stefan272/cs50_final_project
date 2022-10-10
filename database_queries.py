@@ -129,3 +129,19 @@ def get_balance(user_id):
                                FROM balances 
                               WHERE user_id = ?""", 
                                     (user_id,)).fetchone()
+
+
+def get_password(user_id):
+    #Get the users current password
+    return cursor.execute("""SELECT hash 
+                               FROM users 
+                              WHERE user_id=?""", 
+                                    (user_id,)).fetchone()
+
+
+def update_password(user_id, hash):
+    # Update the users password
+    return cursor.execute("""UPDATE users
+                                SET hash=?
+                              WHERE user_id=?""", 
+                                    (hash, user_id))
