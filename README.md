@@ -7,7 +7,6 @@
 >The application uses Python and sqlite for the backend, and Javascript for the frontend. The framework used is Flask.
 
 ![welcome](static/images/Screenshots/Welcome.png)
-![dashboard](static/images/Screenshots/Dashboard.png)
 
 ---
 ## Sections
@@ -30,6 +29,7 @@
     - [Changing password](#changing-password)
     - [Updating current balance](#updating-current-balance)
 - [Additional Information](#additional-information)
+- [Dashboard Example](#dashboard-example)
 
 ---
 ## Registering
@@ -156,3 +156,8 @@ From the setting page, there is a form for the user to update their password. Th
 ## Additional Information
 
 random data creation
+
+---
+## Dashboard Example
+
+![dashboard](static/images/Screenshots/Dashboard.png)
