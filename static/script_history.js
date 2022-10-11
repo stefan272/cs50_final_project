@@ -80,7 +80,7 @@ document.addEventListener("DOMContentLoaded", function(){
         sort: true,
         resizable: true,
         pagination: {
-            limit: 15
+            limit: 10
         },
         style: {
             th: {
