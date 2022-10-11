@@ -25,7 +25,6 @@ function monthStart() {
     let mo = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(startDate);
     let da = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(startDate);
     let formatDate = `${ye}-${mo}-${da}`;
-    // console.log(formatDate);
     return formatDate;
 };
 
@@ -40,7 +39,6 @@ function monthEnd() {
     let mo = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(startDate);
     let da = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(startDate);
     let formatDate = `${ye}-${mo}-${da}`;
-    // console.log(formatDate);
     return formatDate;
 };
 
@@ -49,7 +47,6 @@ function lastYear() {
     var startDate = new Date();
     startDate.setFullYear(startDate.getFullYear() - 1);
     var formatted = startDate.toISOString().slice(0, 10)
-    // console.log(formatted)
     return formatted;
 };
 
@@ -60,23 +57,19 @@ function updateChart() {
         const url = '/api/data';
         const response = await fetch(url);
         const data = await response.json();
-        // console.log(data);
         return data;
     };
     
     fetchData().then(data => {
         // Filter the data to just show the expenses
         var expensesData = data.filter((e) => e.type == 'Expense');
-        // console.log(expensesData);
 
 		    // Filter out the data older than 1 year
         var lastYearDate = lastYear()
         var lastYearsData = expensesData.filter((e) => e.date >= lastYearDate);
-        // console.log(lastYearsData);
 
         // Group the yearly data by category
         var groupedYearlyData = groupByCategory(lastYearsData);
-        // console.log(groupedYearlyData);
 
         // Group the monthly data by category
         var startMonth = monthStart();
@@ -102,7 +95,6 @@ function updateChart() {
         
         // Sort the data by the current months amounts
         groupedThisMonthData.sort((a, b) => a.sum - b.sum);
-        // console.log(groupedThisMonthData)
 
         // Update the data field in the grid
         expensesBar.config.data.datasets[0].data = groupedThisMonthData;
@@ -120,7 +112,7 @@ function updateChart() {
 
         // Get the total spending of the current month
         var monthlyTotal = groupedThisMonthData.reduce((total, category) => total + category.sum, 0);
-        console.log(monthlyTotal);
+
         // Update the HTML elements
         document.getElementById('averageMonth').innerHTML = '£'+averageTotal.toFixed(2);
         document.getElementById('currentMonth').innerHTML = '£'+monthlyTotal.toFixed(2);
@@ -142,7 +134,7 @@ function updateChart() {
         // Highest spend
         // Sort the months data highest to lowest
         thisMonthsData.sort((a, b) => a.amount - b.amount);
-        console.log(thisMonthsData[0]);
+  
         // Update the HTML element
         if (thisMonthsData[0] === undefined) {
           document.getElementById('highest').innerHTML = "N/A"
@@ -276,13 +268,13 @@ function updateBalanceChart() {
       const url = '/api/data/balance';
       const response = await fetch(url);
       const data = await response.json();
-      console.log(data);
+
       return data;
   };
   
   fetchData().then(data => {
       data.sort((a, b) => b.date - a.date);
-      // console.log(data);
+
       // Update the data field in the grid
       balanceBar.config.data.datasets[0].data = data;
       balanceBar.config.data.datasets[1].data = data;
@@ -291,11 +283,6 @@ function updateBalanceChart() {
       balanceBar.update();
 
   });
-
-  // fetch('/api/data/balance', {method:'GET'})
-  // .then (data => {
-  //   console.log(data);
-  // });
 };
 
 //   Chart Setup =========================

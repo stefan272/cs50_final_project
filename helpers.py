@@ -104,7 +104,7 @@ def date_strip(text):
 
 
 # Assign categories
-def categorize(transactions): #TODO
+def categorize(transactions):
 
 # for each of the rows
     for item in transactions:

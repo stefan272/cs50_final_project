@@ -11,7 +11,7 @@ def dict_factory(cursor, row):
     for idx, col in enumerate(cursor.description):
         d[col[0]] = row[idx]
     return d
-connection = sqlite3.connect('final.db', check_same_thread=False)
+connection = sqlite3.connect('dashboard.db', check_same_thread=False)
 connection.row_factory = dict_factory
 cursor = connection.cursor()
 
@@ -36,7 +36,7 @@ def main():
         random_date = random_date_object.strftime("%d/%m/%Y")
 
         # Generate a random price
-        price = round(random.triangular(-100, 100, -75), 2)
+        price = round(random.triangular(-100, 100, 0), 2)
 
         # Generate a random description
         if price <= 0:
@@ -75,8 +75,6 @@ def main():
 
         # Add the row to the data list
         data.append(row)
-
-    print(len(data))
 
     with open(f'sample_data-{sys.argv[1]}.csv', 'w', encoding='UTF8', newline='') as f:
         writer = csv.writer(f)

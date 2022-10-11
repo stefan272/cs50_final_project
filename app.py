@@ -94,7 +94,6 @@ def login():
 
         # Query database for username
         rows = dq.username_check(entries['username'])
-# TODO this isn't working correctly
 
         # Ensure username and password are valid
         if len(rows) != 1 or not check_password_hash(rows[0]['hash'], entries['password']):
@@ -309,8 +308,6 @@ def category_return():
     for item in categories:
         cat_list.append(item['category'])
 
-    print(cat_list)
-
     return json.dumps(cat_list)
 
 
@@ -319,7 +316,6 @@ def category_return():
 def multi_delete():
     
     data = request.get_json()
-    print(data)
     for id in request.get_json():
         dq.delete_transaction(session['user_id'], id)
 

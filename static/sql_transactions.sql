@@ -6,9 +6,6 @@ last_name TEXT NOT NULL,
 username TEXT NOT NULL,
 hash TEXT NOT NULL);
 
-ALTER TABLE transactions
-RENAME COLUMN category TO cat_id;
-
 -- Create transactions table
 CREATE TABLE IF NOT EXISTS transactions (
 transaction_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,

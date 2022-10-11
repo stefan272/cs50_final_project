@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function(){
     //         let res = await fetch(url);
     //         return await res.json();
     //     } catch (error) {
-    //         console.log(error);
+    //     
     //     }
     // };
 
@@ -21,12 +21,12 @@ document.addEventListener("DOMContentLoaded", function(){
     //         let htmlSegment = `<option>`+option+`</option>`;
     //         html += htmlSegment;
     //     });
-    //     console.log(html)
+    //    
     //     return html
     // };
 
     // let optionsHTML = renderOptions().then(function(result) {return result;});
-    // console.log(optionsHTML);
+
 
 
     function renderOptions() {
@@ -123,7 +123,7 @@ document.addEventListener("DOMContentLoaded", function(){
     deleteButton.addEventListener('click', ev => {
         const checkboxPlugin = grid.config.plugin.get('checkbox');
         const transactionsToDelete = checkboxPlugin.props.store.state;
-        console.log(transactionsToDelete);
+  
 
         if (Object.values(transactionsToDelete) != NaN) {
             fetch('/api/data/delete', {
@@ -142,7 +142,6 @@ document.addEventListener("DOMContentLoaded", function(){
         tableDiv.addEventListener('change', ev => {
         if (ev.target.tagName === 'select') {
             savedValue = ev.target.value;
-            console.log(savedValue);
         }
         });
 
