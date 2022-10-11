@@ -80,10 +80,6 @@ nav ul li::after {
     margin-top: 10px;
     float: top;
 }
-.text-blue {
-    color: #537fbe;
-    font-weight: bold;
-}
 .support-block {
     background-color: rgba(200,200,200,0.25);
     width: 50vw;
@@ -96,10 +92,6 @@ nav ul li::after {
 }
 .support-block ul {
     text-align: left;
-}
-.text-green {
-    color: #2e944b;
-    font-weight: bold;
 }
 .dashboard-cards-small {
     display: grid;
@@ -124,12 +116,9 @@ nav ul li::after {
     border-color:rgba(126, 142, 249, 0.8);
     justify-self: center;
 }
-
 .chart-canvas {
     margin: 20px;
     position: relative;
-    /* min-height: 250px;
-    max-height: 500px; */
 }
 .dashboard-block {
     background-Color: rgb(206, 206, 206);
@@ -141,7 +130,7 @@ nav ul li::after {
 }
 .right {
     float: right;
-    margin-right: 1em;
+    margin-right: 5em;
 }
 .dashboard-banner {
     display: flex;
@@ -161,7 +150,7 @@ nav ul li::after {
     align-items: center;
     align-content: space-around;
 }
-.dashboardInsight {
+.dashboard-insight {
     display: flex;
     flex-flow: row wrap;
     justify-content: space-around;
@@ -170,22 +159,21 @@ nav ul li::after {
     padding-left: 2em;
     padding-right: 2em;
 }
-.dashboardInsightBlock {
+.dashboard-insight-block {
     margin-top: 10px;
     padding-left: 0.5em;
     padding-right: 0.5em;
     border-left: 5px solid rgb(74, 102, 172);
 }
-.dashboardInsight ul {
+.dashboard-insight ul {
     list-style-type: none;
     text-align: left;
     flex-grow: 1;
 }
-.dashboardInsightBlock p {
+.dashboard-insight-block p {
     color: rgb(74, 102, 172);
 }
-
-.welcomeLowerBanner {
+.welcome-lower-banner {
     background-color: rgba(200, 200, 200, 0.85);
     position: absolute;
     width: 100vw;
@@ -196,14 +184,14 @@ nav ul li::after {
     align-items: center;
     align-content: stretch;
 }
-.lowerBannerBlock {
+.welcome-lower-banner img {
+    width: 50px;
+}
+.lower-banner-block {
     margin-top: 10px;
     margin-bottom: 10px;
     padding: 10px;
     text-align: center;
-}
-.welcomeLowerBanner img {
-    width: 50px;
 }
 .table-container {
     width: 85vw;

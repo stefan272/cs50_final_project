@@ -11,7 +11,7 @@
         <p>Current Balance: {{ balance.current_balance | gbp }}</p>
         <form method="post" action="/settings">
             <div class="form-entry">
-                <small for="amount">Enter your new balance</small>
+                <small>Enter your new balance</small>
                 <input type="number" class="form-control mx-auto w-auto" name="balance" placeholder={{ balance.current_balance | gbp }} step=".01" required>
                 <button type="submit" class="btn btn-primary mt-3">Submit</button>
             </div>
@@ -21,7 +21,7 @@
         </a>
     </div>
 </div>
-<div class="container-fluid mb-5"></div>
+<div class="container-fluid mb-5">
     <div class="form-box mx-auto">
         <h2 class="display-5">Update Password</h2>
         <form action="password_change" method="post">

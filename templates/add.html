@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Upload
+    Add
 {% endblock %}
 {% block main %}
 <h1 class="display-3">Add Transactions</h1>
@@ -10,19 +10,19 @@
         <h2 class="display-4">Add</h2>
         <form method="post" action="/add">
             <div class="form-entry">
-                <small for="date">Select a date</small>
+                <small>Select a date</small>
                 <input type="date" id="date" name="date" class="form-control mx-auto w-auto" required>
             </div>
             <div class="form-entry">
-                <small for="description">Give it a description</small>
+                <small>Give it a description</small>
                 <input class="form-control mx-auto w-auto" type="text" placeholder="Description" id="description" name="description" required>
             </div>
             <div class="form-entry">
-                <small for="amount">Enter an amount</small>
+                <small>Enter an amount</small>
                 <input type="number" placeholder="£0.00" name="amount" id="amount" class="form-control mx-auto w-auto" step=".01" required>
             </div>
             <div class="form-entry">
-                <small for="category">Pick a category</small>
+                <small>Pick a category</small>
                 <select  class="form-control mx-auto w-auto" id="category" name="category" required>
                     <option selected disabled>Select...</option>
                     {% for category in categories %}
@@ -36,8 +36,8 @@
     <div class="form-box mx-auto mt-5">
         <h2 class="display-4">Upload</h2>
         <form action="/add/upload" method="post" enctype="multipart/form-data">
-            <input type="file" name="file" class="custom-file-input btn btn-secondary">
-            <button class="btn btn-primary mt-4 mb-2"type="submit">Upload</button>
+            <input type="file" name="file" class="custom-file-input btn btn-secondary" required>
+            <button class="btn btn-primary mt-4 mb-2" type="submit">Upload</button>
         </form>
         <a href="/support">
             <span>Having trouble?</span>

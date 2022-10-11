@@ -50,7 +50,6 @@ document.addEventListener("DOMContentLoaded", function(){
     function renderAllOptions(id, currentCategory) {
         
         let html = `<center><select name="category" id=`+id+`><option selected>`+currentCategory+`</option>`+optionsHTML+`</select></center>`;
-        // console.log(html)
         return html;
     };
 
@@ -100,13 +99,12 @@ document.addEventListener("DOMContentLoaded", function(){
         },
         search: true,
         autoWidth: true,
-        // width: '95%',
+        width: '80%',
         sort: true,
-        // resizable: true,
+        resizable: true,
         pagination: {
-            limit: 10
+            limit: 15
         },
-        // fixedHeader: true,
         style: {
             th: {
                 'background-color': 'rgba(74, 102, 172, 0.5)',

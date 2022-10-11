@@ -11,7 +11,7 @@
     </div>
     <div class="dashboard-cards-small">
         <div class="wrapper">
-            <div class="dashboardInsightBlock">
+            <div class="dashboard-insight-block">
                 <h3>Current Balance</h3>
                 <p class="lead">{{ balance.current_balance | gbp }}</p>
                 <a href="/settings">Want to change this?</a>
@@ -69,24 +69,24 @@
                 <h3 class="display-5">Insights</h3>
                 <div class="wrapper">
                     <div class="wrapper">
-                        <div class="dashboardInsightBlock">
+                        <div class="dashboard-insight-block">
                             <h3>Average</h3>
                             <p id="averageMonth"></p>
                         </div>
-                        <div class="dashboardInsightBlock">
+                        <div class="dashboard-insight-block">
                             <h3>Current</h3>
                             <p id="currentMonth"></p>
                         </div>
                     </div>
-                    <div class="dashboardInsight">
+                    <div class="dashboard-insight">
                         <ul>
                             <li>
-                                <div class="dashboardInsightBlock">
+                                <div class="dashboard-insight-block">
                                     <p><span id="difference"></span></p>
                                 </div>
                             </li>
                             <li>
-                                <div class="dashboardInsightBlock">
+                                <div class="dashboard-insight-block">
                                     <p><span id="highest"></span></p>
                                 </div>
                             </li>
@@ -101,6 +101,5 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" integrity="sha512-ElRFoEQdI5Ht6kZvyzXhYG9NqjtkmlkfYk0wr6wHxU9JEHakS7UJZNeml5ALk+8IKlU6jDgMabC3vkumRokgJA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-stacked100@1.0.0"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-<script type="text/javascript" src="/static/script_dashboard.js"></script>
+<script src="/static/script_dashboard.js"></script>
 {% endblock %}
-
