@@ -1,14 +1,16 @@
-// Group data array by category
+// Helper functions =========================
+
+// Group data array by category with a total sum for each
 function groupByCategory(array) {
     var result = [];
     array.reduce(function (res, value) {
-    if (!res[value['category']]) {
-        res[value['category']] = { x: value['category'], sum: 0 };
-        result.push(res[value['category']]);
-    }
-    res[value['category']].sum += value.amount;
-    return res;
-    }, {});
+        if (!res[value['category']]) {
+            res[value['category']] = { x: value['category'], sum: 0 };
+            result.push(res[value['category']]);
+        }
+        res[value['category']].sum += value.amount;
+        return res;
+        }, {});
     return result;
 };
 
@@ -50,6 +52,7 @@ function lastYear() {
     return formatted;
 };
 
+// Chart Setup - Expenses =========================
 
 // Fetch block
 function updateChart() {
@@ -60,11 +63,12 @@ function updateChart() {
         return data;
     };
     
+    // Process the server data
     fetchData().then(data => {
         // Filter the data to just show the expenses
         var expensesData = data.filter((e) => e.type == 'Expense');
 
-		    // Filter out the data older than 1 year
+		// Filter out the data older than 1 year
         var lastYearDate = lastYear()
         var lastYearsData = expensesData.filter((e) => e.date >= lastYearDate);
 
@@ -75,7 +79,7 @@ function updateChart() {
         var startMonth = monthStart();
         var endMonth = monthEnd();
         var thisMonthsData = expensesData.filter((e) => e.date >= startMonth && e.date < endMonth);
-        // Group this months data by category
+        // Group the current months data by category
         var groupedThisMonthData = groupByCategory(thisMonthsData);
 
         // Add the averages to the monthly data object
@@ -92,7 +96,6 @@ function updateChart() {
             e.avg = Math.abs((e.avg).toFixed(2));
         });
 
-        
         // Sort the data by the current months amounts
         groupedThisMonthData.sort((a, b) => a.sum - b.sum);
 
@@ -103,9 +106,10 @@ function updateChart() {
         // Globally update the chart
         expensesBar.update();
 
-        // Insights
+        // Insights =========================
 
-        // Monthly spends
+        // Monthly spends =====
+
         // Get the total spending of an average month from the last year
         var averageTotal = groupedYearlyData.reduce((total, category) => total + category.sum, 0);
         averageTotal = Math.abs(averageTotal / 12);
@@ -117,7 +121,8 @@ function updateChart() {
         document.getElementById('averageMonth').innerHTML = '£'+averageTotal.toFixed(2);
         document.getElementById('currentMonth').innerHTML = '£'+monthlyTotal.toFixed(2);
         
-        // Difference
+        // Difference =====
+
         // Get the difference between the average and current months
         const difference = (monthlyTotal - averageTotal).toFixed(2);
         // Update HTML elements depending on difference value
@@ -131,7 +136,8 @@ function updateChart() {
         document.getElementById('difference').innerHTML = "You've spent " + '£'+ Math.abs(difference) + ' less than the average';
         };
         
-        // Highest spend
+        // Highest spend =====
+
         // Sort the months data highest to lowest
         thisMonthsData.sort((a, b) => a.amount - b.amount);
   
@@ -145,12 +151,12 @@ function updateChart() {
 	  });
 };
 
-//   Chart Setup =========================
+// Chart plugin setup =========================
 
 Chart.register(ChartjsPluginStacked100.default);
 Chart.register(ChartDataLabels);
 
-//   Bar chart============================
+// Bar chart - Expenses ============================
 
 // Setup 
 const dataExpenses = {
@@ -225,7 +231,7 @@ const dataExpenses = {
     ]
   };
 
-// config - bar chart
+// Configuration - bar chart
 const configExpensesBar = {
 	type: 'bar',
 	data: dataExpenses,
@@ -253,15 +259,14 @@ const configExpensesBar = {
   }
 };
 
-// render bar chart block
+// Render - bar chart
 const expensesBar = new Chart(
   document.getElementById('expensesBar'),
   configExpensesBar
 );
 
+// Chart Setup - Balance =====================================
 
-
-//   =====================================
 // Fetch block
 function updateBalanceChart() {
   async function fetchData() {
@@ -285,13 +290,13 @@ function updateBalanceChart() {
   });
 };
 
-//   Chart Setup =========================
+// Chart Plugin Setup =========================
 
 Chart.register(ChartDataLabels);
 
-//   Bar chart============================
+// Mixed Chart - Balance ============================
 
-// Setup 
+// Setup
 const dataBalance = {
   // labels: [],
   datasets: [{
@@ -347,7 +352,7 @@ const dataBalance = {
 ]
 };
 
-// config - bar chart
+// Configuration - bar chart
 const configBalanceBar = {
 type: 'bar',
 data: dataBalance,
@@ -375,11 +380,12 @@ options: {
 }
 };
 
-// render bar chart block
+// Render - bar chart
 const balanceBar = new Chart(
 document.getElementById('balanceBar'),
 configBalanceBar
 );
 
+// Update all chart objects when content loaded
 document.addEventListener("DOMContentLoaded", updateBalanceChart());
 document.addEventListener("DOMContentLoaded", updateChart());

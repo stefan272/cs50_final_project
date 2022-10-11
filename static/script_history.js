@@ -1,34 +1,7 @@
-// import { Grid, html } from "gridjs";
-
 document.addEventListener("DOMContentLoaded", function(){
     const tableDiv = document.getElementById('table');
 
-    // Async function to get categories from server **NOT WORKING***
-    // async function getCategories() {
-    //     let url = '/api/data/categories';
-    //     try {
-    //         let res = await fetch(url);
-    //         return await res.json();
-    //     } catch (error) {
-    //     
-    //     }
-    // };
-
-    // async function renderOptions() {
-    //     let options = await getCategories();
-    //     let html = ''
-    //     options.forEach(option => {
-    //         let htmlSegment = `<option>`+option+`</option>`;
-    //         html += htmlSegment;
-    //     });
-    //    
-    //     return html
-    // };
-
-    // let optionsHTML = renderOptions().then(function(result) {return result;});
-
-
-
+    // Create drop-down categories options for HTML
     function renderOptions() {
         let options = ['Bills', 'Eating Out', 'Entertainment', 
                        'Family', 'Finances', 'Gifts (Giving)', 
@@ -37,22 +10,24 @@ document.addEventListener("DOMContentLoaded", function(){
                        'Transfers', 'Transport', 'General (Income)', 
                        'General (Expense)'];
         let html = '';
+        // For each option, create a HTML option string and combine them into a single HTML single
         options.forEach(option => {
             let htmlSegment = `<option>`+option+`</option>`;
             html += htmlSegment;
         });
         return html;
-    }
+    };
     
-
+    // Call the function to create HTML string of all given categories
     let optionsHTML = renderOptions();
 
-    function renderAllOptions(id, currentCategory) {
-        
+    // Compile the current category with the list of all available categories
+    function renderAllOptions(id, currentCategory) {  
         let html = `<center><select name="category" id=`+id+`><option selected>`+currentCategory+`</option>`+optionsHTML+`</select></center>`;
         return html;
     };
 
+    // Function to update the category of a transaction via user input
     function updateCategory(cat, id) {
         fetch('/api/data/update', {
             method: 'POST',
@@ -62,6 +37,7 @@ document.addEventListener("DOMContentLoaded", function(){
             }).then()
     };
 
+    // Create the history table
     const grid = new gridjs.Grid({
         columns: [
         { id: 'transaction_id', name: 'Transaction ID', 'hidden': true },
@@ -93,13 +69,14 @@ document.addEventListener("DOMContentLoaded", function(){
             }
         }
         ],
+        // Table data is fetched from server
         server: {
             url: '/api/data',
             then: results => results
         },
+        // Table feature/style options
         search: true,
         autoWidth: true,
-        width: '80%',
         sort: true,
         resizable: true,
         pagination: {
@@ -118,13 +95,15 @@ document.addEventListener("DOMContentLoaded", function(){
         }
     }).render(tableDiv);
 
+    // Allow for transaction deletion by user
     const deleteButton = document.getElementById('delete');
 
+    // On button click, selected transactions are deleted
     deleteButton.addEventListener('click', ev => {
         const checkboxPlugin = grid.config.plugin.get('checkbox');
         const transactionsToDelete = checkboxPlugin.props.store.state;
   
-
+        // If a checkbox is ticked, pass the transaction ID to the server for deletion
         if (Object.values(transactionsToDelete) != NaN) {
             fetch('/api/data/delete', {
                 method: 'POST',
@@ -137,27 +116,30 @@ document.addEventListener("DOMContentLoaded", function(){
 
     // https://blog.miguelgrinberg.com/post/beautiful-flask-tables-part-2
 
+    // For category change of transaction
     let savedValue;
 
-        tableDiv.addEventListener('change', ev => {
-        if (ev.target.tagName === 'select') {
-            savedValue = ev.target.value;
-        }
-        });
+    // When a field is changed, the new selected category name is stored
+    tableDiv.addEventListener('change', ev => {
+    if (ev.target.tagName === 'select') {
+        savedValue = ev.target.value;
+    }
+    });
 
-        tableDiv.addEventListener('focusout', ev => {
-        if (ev.target.tagName === 'select') {
-            if (savedValue !== ev.target.textContent) {
-            fetch('/api/data/update', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                id: ev.target.dataset.elementId,
-                [ev.target.dataset.columnId]: ev.target.textContent
-                }),
-            });
-            }
-            savedValue = undefined;
-        }
+    // When the user clicks off the selection box, the data is sent to the server
+    tableDiv.addEventListener('focusout', ev => {
+    if (ev.target.tagName === 'select') {
+        if (savedValue !== ev.target.textContent) {
+        fetch('/api/data/update', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+            id: ev.target.dataset.elementId,
+            [ev.target.dataset.columnId]: ev.target.textContent
+            }),
         });
+        }
+        savedValue = undefined;
+    }
+    });
 });

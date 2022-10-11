@@ -1,5 +1,6 @@
 import sqlite3
 import threading
+
 from datetime import datetime, date
 
 # Configure SQLite database
@@ -81,13 +82,13 @@ def all_transactions(user_id):
     try:
         lock.acquire(True)
         res = cursor.execute("""SELECT date, amount, description, categories.category, transaction_id, categories.type
-                                FROM transactions
-                                        JOIN categories
-                                        ON transactions.cat_id = categories.cat_id
-                                WHERE user_id = ?
-                                ORDER BY date 
-                                        DESC""", 
-                                        (user_id,)).fetchall()
+                                  FROM transactions
+                                       JOIN categories
+                                       ON transactions.cat_id = categories.cat_id
+                                 WHERE user_id = ?
+                              ORDER BY date 
+                                       DESC""", 
+                                       (user_id,)).fetchall()
     finally:
         lock.release()
 

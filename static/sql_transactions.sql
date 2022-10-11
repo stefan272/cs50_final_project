@@ -152,6 +152,3 @@ JOIN categories
 ON transactions.cat_id = categories.cat_id
 WHERE user_id = 3
 ORDER BY date DESC;
-
-
-INSERT INTO user_assignments(user_id, cat_id, description) VALUES (3, 3, 'text');

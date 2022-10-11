@@ -45,25 +45,25 @@ def after_request(response):
 @helpers.login_required
 def index():
     
-    # Create list of available years
+    # Create list of available years of data for user
     
     # Get current year
-    currentYear = date.today().year
+    current_year = date.today().year
 
     # Get the oldest date from the transactions
-    oldestYear = dq.oldest_year(session['user_id'])
+    oldest_year = dq.oldest_year(session['user_id'])
  
     years = []
-    for year in range(oldestYear, currentYear+1):
+    for year in range(oldest_year, oldest_year + 1):
         years.append(year)
 
     # Get the current month for the initial chart filter
-    currentMonth = date.today().strftime('%b')
+    current_month = date.today().strftime('%b')
 
-    # Get current balance
+    # Get current balance of the user
     balance = dq.get_balance(session['user_id'])
 
-    return render_template('index.html', currentMonth=currentMonth, currentYear=currentYear, years=years, balance=balance)
+    return render_template('index.html', currentMonth=current_month, currentYear=current_year, years=years, balance=balance)
 
 
 @app.route('/welcome')
@@ -169,7 +169,7 @@ def register():
 @app.route('/add', methods=['GET', 'POST'])
 @helpers.login_required
 def add():
-    # Allow user to add a transaction
+    # Allow user to add a single transaction
 
     # Query list of available categories
     categories = dq.categories()
@@ -253,7 +253,8 @@ def upload():
     
     # Remove the uploaded file
     os.remove('static/uploads/{}'.format(file.filename))
-        
+
+    # Assign categories to the transactions and add to database
     helpers.categorize(transactions)
 
     flash('Transactions Uploaded!')
@@ -281,10 +282,12 @@ def data():
 @app.route('/api/data/update', methods=['POST'])
 @helpers.login_required
 def update():
-    
+    # Update a transactions category
+
     data = request.get_json()
     if 'id' not in data:
-        return render_template('error.html')
+        flash("Invalid Selection")
+        return redirect('/history'), 400
 
     # Query for new cat id
     try:
@@ -300,6 +303,7 @@ def update():
 @app.route('/api/data/categories')
 @helpers.login_required
 def category_return():
+    # Query a list of available categories
 
     categories = dq.categories()
 
@@ -314,8 +318,9 @@ def category_return():
 @app.route('/api/data/delete', methods=['POST'])
 @helpers.login_required
 def multi_delete():
+    # Delete transactions from database
     
-    data = request.get_json()
+    # data = request.get_json()
     for id in request.get_json():
         dq.delete_transaction(session['user_id'], id)
 
@@ -332,11 +337,15 @@ def support():
 def settings():
 
     if request.method == 'POST':
+
+        # If user has requested to update their balance
         fields = ['balance']
         entries = helpers.validate_entries(request.form, fields)
         if len(entries) != len(fields):
             flash("Enter all fields")
             return redirect('/settings')
+        
+        # Update the users balance
         dq.update_balance(session['user_id'], entries['balance'])
 
         flash("Balance Updated!")
@@ -348,7 +357,7 @@ def settings():
 @app.route("/password_change", methods=["POST"])
 @helpers.login_required
 def password_change():
-    """Change user password"""
+    # Allow for password change
 
     fields = ['current', 'password', 'confirmation']
     entries = helpers.validate_entries(request.form, fields)
@@ -382,43 +391,51 @@ def password_change():
 @app.route('/api/data/balance')
 @helpers.login_required
 def balance_data():
+    # Query for users balance
 
-        # get list of all transactions
-        data = dq.all_transactions(session['user_id'])
-        # from data, get a list of all the unique months
-        months = set()
-        for item in data:
-            months.add(item['date'][:-3])
-        # Initiate the sorted data
-        grouped = []
-        for month in months:
-            entry = {}
-            entry['date'] = month
-            entry['total'] = 0
-            grouped.append(entry)
-        # Sum up the monthly totals
-        for entry in data:
-            new_date = entry['date'][:-3]
-            def find(lst, key, value):
-                for i, dic in enumerate(lst):
-                    if dic[key] == value:
-                        return i
-                return -1
-            index = find(grouped, 'date', new_date)
-            grouped[index]['total'] += entry['amount']
-            grouped[index]['total'] = round(grouped[index]['total'], 2)
-        # Sort the list
-        sorted_grouped = sorted(grouped, key=itemgetter('date'), reverse=True)
-        # Add the balances
+    # Get list of all transactions
+    data = dq.all_transactions(session['user_id'])
 
-        # Initiate current balance
-        balance = dq.get_balance(session['user_id'])['current_balance']
-        # Calcuate the balances after each transaction
-        for item in sorted_grouped:
-            item['balance'] = round(balance - item['total'], 2)
-            balance = item['balance']
-        reversed = sorted(sorted_grouped, key=itemgetter('date'), reverse=False)
-        return json.dumps(reversed)
+    # From data, get a list of all the unique months
+    months = set()
+    for item in data:
+        months.add(item['date'][:-3])
+
+    # Initiate the sorted data
+    grouped = []
+    for month in months:
+        entry = {}
+        entry['date'] = month
+        entry['total'] = 0
+        grouped.append(entry)
+
+    # Sum up the monthly totals
+    for entry in data:
+        # Strip day from date
+        new_date = entry['date'][:-3]
+        # Find the index of the entry in the grouped list
+        index = helpers.find(grouped, 'date', new_date)
+        # Add the amount to the grouped totals
+        grouped[index]['total'] += entry['amount']
+
+    # Round the totals to 2 decimal places
+    for item in grouped:
+        item['total'] = round(item['total'], 2)
+
+    # Sort the list
+    sorted_grouped = sorted(grouped, key=itemgetter('date'), reverse=True)
+
+    # Initiate current balance
+    balance = dq.get_balance(session['user_id'])['current_balance']
+    # Calcuate the balances after each month
+    for item in sorted_grouped:
+        item['balance'] = round(balance - item['total'], 2)
+        balance = item['balance']
+
+    # Reverse the order of the data
+    reversed = sorted(sorted_grouped, key=itemgetter('date'), reverse=False)
+    
+    return json.dumps(reversed)
 
 
 if __name__ == '__main__':

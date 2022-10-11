@@ -3,6 +3,7 @@ import random
 import string
 import sys
 import csv
+
 from faker import Faker
 
 # Configure SQLite database
