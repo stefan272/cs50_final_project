@@ -111,6 +111,7 @@ If the user has a large amount of transactions to add, the easiest method is to 
 
 The CSV file must match the following table structure;
 
+
 | Date       | Amount | Description  |
 | ---------- | ------ | ------------ |
 | 2022/08/25 | -100   | Shopping     |
