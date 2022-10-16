@@ -278,14 +278,21 @@ function updateBalanceChart() {
   };
   
   fetchData().then(data => {
-      data.sort((a, b) => b.date - a.date);
+    
+    // Difference in balance since last month
+    let balanceDifferenceMonthly = (data[data.length - 1].balance - data[data.length - 2].balance).toFixed(2);
+    document.getElementById('balanceDifferenceMonthly').innerHTML = '£' + balanceDifferenceMonthly;
+    
+    // Difference in balance since last year
+    let balanceDifferenceYearly = (data[data.length - 1].balance - data[data.length - 13].balance).toFixed(2);
+    document.getElementById('balanceDifferenceYearly').innerHTML = '£' + balanceDifferenceYearly;
+    
+    // Update the data field in the grid
+    balanceBar.config.data.datasets[0].data = data;
+    balanceBar.config.data.datasets[1].data = data;
 
-      // Update the data field in the grid
-      balanceBar.config.data.datasets[0].data = data;
-      balanceBar.config.data.datasets[1].data = data;
-
-      // Globally update the chart
-      balanceBar.update();
+    // Globally update the chart
+    balanceBar.update();
 
   });
 };

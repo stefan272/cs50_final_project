@@ -9,12 +9,20 @@
     <div class="dashboard-banner">  
         <h2 class="display-4">Overview</h2>
     </div>
-    <div class="dashboard-cards-small">
+    <div class="wrapper-column">
         <div class="wrapper">
             <div class="dashboard-insight-block">
                 <h3>Current Balance</h3>
                 <p class="lead">{{ balance.current_balance | gbp }}</p>
                 <a href="/settings">Want to change this?</a>
+            </div>
+            <div class="dashboard-insight-block">
+                <h3>Difference Since Last Month</h3>
+                <p class="lead" id="balanceDifferenceMonthly"></p>
+            </div>
+            <div class="dashboard-insight-block">
+                <h3>Difference Since Last Year</h3>
+                <p class="lead" id="balanceDifferenceYearly"></p>
             </div>
         </div>
     </div>
