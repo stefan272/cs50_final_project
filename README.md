@@ -2,7 +2,7 @@
 #### Video Demo:  <URL HERE>
 #### Description:
 
-> fin-dash is a financial dashboard web-application that allows users to categorise and track their expenses. Users are able to create an account within the application giving them returnable access.
+fin-dash is a financial dashboard web-application that allows users to categorise and track their expenses. Users are able to create an account within the application giving them returnable access.
 
 >The application uses Python and sqlite for the backend, and Javascript for the frontend. The framework used is Flask.
 
@@ -59,8 +59,31 @@ Returning users to the site will be able to log back into their accounts from th
 ---
 ## Categorization
 
-Aim is to split up spends into different categories, can be income/expense
-list the categories
+One of the aims of the dashboard is to organise transactions into a range of categories so that the user can see how their outgoings are split.
+
+The categories used in this program are:
+
+| Category          | Type    |
+| ----------------  | ------- |
+| Bills             | Expense |
+| Eating Out        | Expense |
+| Entertainment     | Expense |
+| Family            | Expense |
+| Finances          | Expense |
+| Gifts (Giving)    | Expense |
+| Gifts (Receiving) | Income  |
+| Groceries         | Expense |
+| Holidays          | Expense |
+| Salary            | Income  |
+| Personal Care     | Expense |
+| Savings           | Expense |
+| Shopping          | Expense |
+| Transfers         | Expense |
+| Transport         | Expense |
+| General (Income)  | Income  |
+| General (Expense) | Expense |
+
+Transactions are categorized either through manually selecting a category when [adding a single transaction](#manual), or automatically when [uploading a CSV](#uploading).
 
 ---
 ## Main Dashboard
@@ -69,30 +92,36 @@ list the categories
 
 ### Overview
 
-The overiew section is located at the top of the main dashboard. Inside of this block is a look at the users current balance.
-Alongside this is also a link for the user to update their current balance if they require (see [here](#updating-current-balance) for more details).
+The overiew section is located at the top of the main dashboard. Inside of this block is a look at the users current balance, and how it has changed over the last month, and last year.
+Alongside this is also a link for the user to [update their current balance](#updating-current-balance) if they require.
 
-**IMAGE**
+![overview](static/images/Screenshots/Overview.png)
 
 ### Balance Chart
 
-The balance chart has two elements - a balance line chart and a monthly total bar chart.  The aim is to give a visual representation of how the users balance has changed over time, and highlights the months where the user was in positive or negative equity.
+The balance chart has two elements - a balance line chart and a monthly total bar chart.  This gives a visual representation of how the users balance has changed over time, and highlights the months where the user was in positive or negative equity.
 
-The chart timeline spans from the start of the users transactions to now. 
+The chart timeline spans from the start of the users transactions to the current month. 
 
-Each element on the chart can be activated/deactivated by the user by clicking on the legend objects.
+Each element on the chart can be activated/deactivated by the user by clicking on the legend objects. By default, all chart elements are activated.
 
 ![balance](static/images/Screenshots/Balance.png)
 
 ### Expenses Chart
 
-Defaults to the current month, shows the amount of expenses per category a user has spent in that month. Averages hidden by default.
+The expenses chart shows the users spending totals per category for a given month. When the page is loaded, the current months data is displayed. This can be changed using the date selection boxes located on the right of the card. The chart also features an 'averages' overlay which shows the average total spending per category over the last year. By default, this overlay is deactivated, creating a cleaner and more visual chart. Users can activate the 'averages' data by clicking on the legend object.
+
+Each element on the chart can be activated/deactivated by the user by clicking on the legend objects. By default, all chart elements are activated.
 
 ![expenses](static/images/Screenshots/Expenses.png)
 
+![averages](static/images/Screenshots/Averages.png)
+
 ### Insights
 
-The insights give a glimpse of how the current month compares to the average over the last year.
+The insights give a glimpse of how the current (or selected) month compares to the average over the last year.
+The card contains the average total spending per month over the last year, along with the current monthly total.
+There is also information on the difference between the average and current, and the highest single expense that month.
 
 ![insights](static/images/Screenshots/Insights.png)
 
@@ -112,30 +141,42 @@ If the user has a large amount of transactions to add, the easiest method is to 
 The CSV file must match the following table structure;
 
 
-| Date       | Amount | Description  |
-| ---------- | ------ | ------------ |
-| 2022/08/25 | -100   | Shopping     |
+| Date       | Amount | Description   |
+| ---------- | ------ | ------------- |
+| 2022/08/25 | -100   | Food Shopping |
 
-Handles dates
-Uses the description to categorise transactions into categories (see below)
-Doesnt handle non-csv
-Doesnt handle incorrect column structures
-Information can be found on settings page (see here)
+The upload function will allow for a variety of date formats, and return errors to the user if the column format or file format are incorrect.
+
+During the upload the text within the 'description' field will be checked against a pre-defined assignment table within the database and a category will be determined. This list can be expanded over time to enhance the automatic categorization function. If no match is found, a category of either 'General (Expense)' or 'General (Income)' will be assigned, depending on the sign of the amount.
+
+>For example;
+> - If the text contains the word 'amazon' then a category of 'shopping' will be assigned to the transaction.
+> - If another description contains the word 'gym' then a category of 'Personal Care' will be assigned.
+
+Information can be found on [settings](#settings) page.
 
 ![adding](static/images/Screenshots/Adding.png)
 
 ---
 ## History
 
-![history](static/images/Screenshots/History.png)
+>The history page shows the entirity of the users logged transactions, along with their assigned categories. The data is displayed in a table of 10 items per page. There is also a search field for retrieving specific information.
+
 
 ### Deleting transactions
 
+If the user wishes to delete a single (or multiple) transactions this can be achieved by selecting the checkbox(s) in the 'Remove' column, then clicking the 'Delete' button in the top right.
+
 ### Updating transaction categories
+
+From this page a user has the ability to change the category of any transaction. This is done simply by using the dropdown selection box under the 'Category' column. Once a new category is selected, simply clicking off that cell will update the entry in the database.
+
+![history](static/images/Screenshots/History.png)
+
 ---
 ## Support
 
-The support page gives users more information on how to correctly format a .csv file for uploading. There is a sample dataset and highlights the key columns (and descriptions) that are required for the upload to be accepted.
+The support page gives users more information on how to correctly format the CSV file for uploading. There is a sample dataset and highlights the key columns (and descriptions) that are required for the upload to be accepted.
 
 ![support](static/images/Screenshots/Support.png)
 
@@ -146,16 +187,21 @@ The support page gives users more information on how to correctly format a .csv 
 
 ### Changing password
 
-From the setting page, there is a form for the user to update their password. They will require their existing password to do so, and the new password must be at least 8 characters long.
+From the settings page, there is a form for the user to update their password. They will require their existing password to do so, and the new password must be at least 8 characters long.
 
 ### Updating current balance
+
+When first registering for the dashboard, the users current balance will be initialized at zero. This current balance in calculating the data for the ['Balance Chart'](#balance-chart). The program will user the users current balance, and calculate the balance per month for all of the historical transactional months. Therefore having an accurate 'current balance' is crucial for obtaining accurate data. The user has the ability to update this balance by using the form on the Settings page.
+
+>Note: When a transaction is entered manually from the 'Add' page, the current balance will be updated automatically.
 
 ![settings](static/images/Screenshots/Settings.png)
 
 ---
 ## Additional Information
 
-random data creation
+Alongside the main program there is another python program which can be used to generate random data in a CSV format for testing/illustration. This program can be found as 'random_data.py'. When running the program a desired number of data entries must be entered as a command line argument. (Usage: `python3 random_data.py ###`)
+Two pre-generated data files can be found in the `/static/random_data/` directory.
 
 ---
 ## Dashboard Example
