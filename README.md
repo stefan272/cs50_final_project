@@ -47,7 +47,9 @@ After completing and submitting the form, users will be redirected to the main d
 
 ![register](static/images/Screenshots/Register.png)
 
->#### Technical note: User passwords are hashed before they are added to the database using werkzeug.security.
+>Technical note: User passwords are hashed before they are added to the database using werkzeug.security.
+
+ ##### <a href="#sections" style="color:steelBlue">Back to top</a>
 
 ---
 ## Returning Users
@@ -84,6 +86,8 @@ The categories used in this program are:
 | General (Expense) | Expense |
 
 Transactions are categorized either through manually selecting a category when [adding a single transaction](#manual), or automatically when [uploading a CSV](#uploading).
+
+##### <a href="#sections" style="color:steelBlue">Back to top</a>
 
 ---
 ## Main Dashboard
@@ -125,6 +129,8 @@ There is also information on the difference between the average and current, and
 
 ![insights](static/images/Screenshots/Insights.png)
 
+##### <a href="#sections" style="color:steelBlue">Back to top</a>
+
 ---
 ## Adding transactions
 
@@ -157,6 +163,8 @@ Information can be found on [settings](#settings) page.
 
 ![adding](static/images/Screenshots/Adding.png)
 
+##### <a href="#sections" style="color:steelBlue">Back to top</a>
+
 ---
 ## History
 
@@ -173,12 +181,16 @@ From this page a user has the ability to change the category of any transaction.
 
 ![history](static/images/Screenshots/History.png)
 
+##### <a href="#sections" style="color:steelBlue">Back to top</a>
+
 ---
 ## Support
 
 The support page gives users more information on how to correctly format the CSV file for uploading. There is a sample dataset and highlights the key columns (and descriptions) that are required for the upload to be accepted.
 
 ![support](static/images/Screenshots/Support.png)
+
+##### <a href="#sections" style="color:steelBlue">Back to top</a>
 
 ---
 ## Settings
@@ -197,13 +209,19 @@ When first registering for the dashboard, the users current balance will be init
 
 ![settings](static/images/Screenshots/Settings.png)
 
+##### <a href="#sections" style="color:steelBlue">Back to top</a>
+
 ---
 ## Additional Information
 
 Alongside the main program there is another python program which can be used to generate random data in a CSV format for testing/illustration. This program can be found as 'random_data.py'. When running the program a desired number of data entries must be entered as a command line argument. (Usage: `python3 random_data.py ###`)
 Two pre-generated data files can be found in the `/static/random_data/` directory.
 
+##### <a href="#sections" style="color:steelBlue">Back to top</a>
+
 ---
 ## Dashboard Example
 
 ![dashboard](static/images/Screenshots/Dashboard.png)
+
+##### <a href="#sections" style="color:steelBlue">Back to top</a>
