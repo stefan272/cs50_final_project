@@ -1,8 +1,8 @@
 # CS50x Final Project - Financial Dashboard
-#### Video Demo:  <URL HERE>
+#### Video Demo:  https://youtu.be/nqQpAd07gBY
 #### Description:
 
-fin-dash is a financial dashboard web-application that allows users to categorise and track their expenses. Users are able to create an account within the application giving them returnable access.
+*fin-dash* is a financial dashboard web-application that allows users to categorise and track their expenses. Users are able to create an account within the application giving them returnable access.
 
 >The application uses Python and sqlite for the backend, and Javascript for the frontend. The framework used is Flask.
 
@@ -34,9 +34,9 @@ fin-dash is a financial dashboard web-application that allows users to categoris
 ---
 ## Registering
 
-From the welcome page new users will be able to register for an account using either the "Sign Up Now!" button, or the "Register" link in the navigation bar.
+From the welcome page, new users will be able to register for an account using either the "Sign Up Now!" button, or the "Register" link in the navigation bar.
 
-From here users will be greeted with a form to enter their personal details including;
+From here users will be greeted with a form to enter their personal details, including:
 
 - First name
 - Last name
@@ -96,7 +96,7 @@ Transactions are categorized either through manually selecting a category when [
 
 ### Overview
 
-The overiew section is located at the top of the main dashboard. Inside of this block is a look at the users current balance, and how it has changed over the last month, and last year.
+The overiew section is located at the top of the main dashboard. Within this card is a look at the users current balance, and how it has changed over the last month, and last year.
 Alongside this is also a link for the user to [update their current balance](#updating-current-balance) if they require.
 
 ![overview](static/images/Screenshots/Overview.png)
@@ -138,13 +138,13 @@ There is also information on the difference between the average and current, and
 
 ### Manual
 
-To add a transaction manually, the user must populate the 'Add' form. It is important to ensure the amount given is signed as once the form is submitted, the amount will be added/deducted from the users current balance.
+To add a transaction manually, the user must populate the 'Add' form. It is important to ensure the amount given is signed (+/-), as once the form is submitted, the amount will be added/deducted from the users current balance.
 
 ### Uploading
 
 If the user has a large amount of transactions to add, the easiest method is to upload a CSV file.
 
-The CSV file must match the following table structure;
+The CSV file must match the following table structure:
 
 
 | Date       | Amount | Description   |
@@ -153,13 +153,13 @@ The CSV file must match the following table structure;
 
 The upload function will allow for a variety of date formats, and return errors to the user if the column format or file format are incorrect.
 
-During the upload the text within the 'description' field will be checked against a pre-defined assignment table within the database and a category will be determined. This list can be expanded over time to enhance the automatic categorization function. If no match is found, a category of either 'General (Expense)' or 'General (Income)' will be assigned, depending on the sign of the amount.
+During the upload, the text within the 'description' field will be checked against a pre-defined assignment table within the database and a category will be determined. This list can be expanded over time to enhance the automatic categorization function. If no match is found, a category of either 'General (Expense)' or 'General (Income)' will be assigned, depending on the sign of the amount.
 
 >For example;
 > - If the text contains the word 'amazon' then a category of 'shopping' will be assigned to the transaction.
 > - If another description contains the word 'gym' then a category of 'Personal Care' will be assigned.
 
-Information can be found on [settings](#settings) page.
+Information can be found on the [settings](#settings) page.
 
 ![adding](static/images/Screenshots/Adding.png)
 
@@ -203,7 +203,7 @@ From the settings page, there is a form for the user to update their password. T
 
 ### Updating current balance
 
-When first registering for the dashboard, the users current balance will be initialized at zero. This current balance in calculating the data for the ['Balance Chart'](#balance-chart). The program will user the users current balance, and calculate the balance per month for all of the historical transactional months. Therefore having an accurate 'current balance' is crucial for obtaining accurate data. The user has the ability to update this balance by using the form on the Settings page.
+When first registering for the dashboard, the users current balance will be initialized at zero. This current balance is used in calculating the data for the ['Balance Chart'](#balance-chart). The program will use the users current balance, and calculate the balance per month for all of the historical transactional months. Therefore having an accurate 'current balance' is crucial for obtaining accurate data. The user has the ability to update this balance by using the form on the Settings page.
 
 >Note: When a transaction is entered manually from the 'Add' page, the current balance will be updated automatically.
 

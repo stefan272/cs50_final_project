@@ -54,9 +54,9 @@ def index():
     oldest_year = dq.oldest_year(session['user_id'])
  
     years = []
-    for year in range(oldest_year, oldest_year + 1):
+    for year in range(oldest_year, current_year + 1):
         years.append(year)
-
+    
     # Get the current month for the initial chart filter
     current_month = date.today().strftime('%b')
 
